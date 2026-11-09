@@ -112,7 +112,9 @@ reference episode: copy its patterns.
   **cast photo cards**. When the narration names the cast ("Police Chief
   Brody, played by Pedro Pascal", "Jesse, played by Jesse Plemons"), the
   owner's photos in `assets/cast/` pop up as tilted cards (original 1975
-  Brody on "Police Chief Brody", then the actor on "played by ..."). Set them
+  Brody on "Police Chief Brody", then the actor on "played by ..."). The
+  same cards work for any image on a line (Jaws 6: a War of 1812 painting
+  on "friggin' War of 1812"). Set them
   in `CAST` in `episode.py`; `assemble.py` overlays them (no re-render).
 
 ## Environment

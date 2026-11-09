@@ -52,5 +52,7 @@ WHISPER_PROMPT = ("Jaws 6. Great white sharks. Shark 911. Rotten Tomatoes score 
 CAST = [
     ("assets/cast/brody_1975.jpg", "police chief brody played by", "played by pedro", 0),
     ("assets/cast/pedro_pascal.jpg", "played by pedro pascal", None, 0.5),
+    # not cast, same card: the owner's War of 1812 painting on the line
+    ("assets/cast/war_of_1812.jpg", "friggin war of 1812", "stop the recording", 0),
     ("assets/cast/jesse_plemons.jpg", "played by jesse plemons", None, 0.5),
 ]
