@@ -68,6 +68,18 @@ reference episode: copy its patterns.
   `radar_land`, `dot_line`, `radar_sweep`, `blink`), `underwater`,
   `make_cave_cutaway`, `make_bait`, `explosion`, `make_drill`, `make_pump`,
   `water_spray`.
+- `fireworks.py` (Jaws 6): `dusk(s)` night sky (call before `make_island` so
+  windows glow), `firework`, `burst`, `rocket_streak` (flat rockets),
+  `make_barge`, `fire` (flames + smoke + flicker light), `smoke_pall`,
+  `flash_light`. Keep spark emission low (~1.5) or colors clip to white.
+- `town.py` (Jaws 6): `make_bookstore`, `make_marquee`/`chase_bulbs`,
+  `make_sailboat`, `make_flag` (waving), `bunting`, `make_pa_pole`,
+  `music_notes`, `question_mark`, `light_bulb`, `pop_in`, `make_tomato`.
+- Radioactive: `make_shark(..., variant="rad")` (glowing green),
+  `props.make_rad_sign`, `make_geiger`/`needle_swing`, `make_beaker`.
+- Reusing old footage: `episodes/jaws6/scenes/shot01_recap.py` loads earlier
+  renders into Blender's sequencer and sets `LOOK = "clip"` so it isn't
+  graded twice.
 - `common.py`: scene/camera (`reset_scene`, `add_sun`, `add_camera`,
   `key_camera`, `add_shake`), `mat` (look-aware), `box/cyl/ico/text/decal`,
   `pixel_mat` (ASCII-art textures), `shot_seconds`, `render`.
