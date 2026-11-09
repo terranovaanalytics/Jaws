@@ -342,3 +342,66 @@ def water_spray(name, at, frame_start, frame_end, direction=(0.4, -0.3, 1.0), sp
                 o.scale = (1.0,) * 3 if k < life else (0.001,) * 3
                 o.keyframe_insert("location", frame=f0 + k)
                 o.keyframe_insert("scale", frame=f0 + k)
+
+
+# ---------------------------------------------------------------- radioactivity
+def make_rad_sign(name="RadSign", loc=(0, 0, 0), size=1.0, rot=(90, 0, 0), coll=None, glow=0.0):
+    """Yellow disc with the black three-bladed radiation trefoil. Faces -Y
+    with the default rot (built flat in XY, like decal())."""
+    root = empty(name, loc, coll=coll)
+    root.rotation_euler = [math.radians(a) for a in rot]
+    yel = mat("rad_yellow" + ("_glow" if glow else ""), (1.0, 0.82, 0.1), emit=glow, flat=0.7)
+    blk = mat("rad_black", (0.03, 0.03, 0.03))
+    cyl(f"{name}_disc", size, 0.05, (0, 0, 0), yel, n=24, parent=root, coll=coll)
+    cyl(f"{name}_hub", 0.16 * size, 0.08, (0, 0, 0.03), blk, n=12, parent=root, coll=coll)
+    for k in range(3):                 # 60-degree blades, 120 degrees apart
+        a0 = math.radians(90 + k * 120 - 30)
+        a1 = a0 + math.radians(60)
+        r0, r1 = 0.26 * size, 0.85 * size
+        seg = 6
+        v, f = [], []
+        for i in range(seg + 1):
+            a = a0 + (a1 - a0) * i / seg
+            v += [(r0 * math.cos(a), r0 * math.sin(a), 0.03), (r1 * math.cos(a), r1 * math.sin(a), 0.03)]
+        for i in range(seg):
+            f.append((2 * i, 2 * i + 1, 2 * i + 3, 2 * i + 2))
+        mesh_obj(f"{name}_blade{k}", v, f, [blk], parent=root, coll=coll)
+    return root
+
+
+def make_geiger(name="Geiger", coll=None):
+    """Handheld yellow Geiger counter: box with a dial and swinging needle,
+    plus a wand on a cable. Origin at the handle. Returns (root, needle, wand)."""
+    root = empty(name, (0, 0, 0), coll=coll)
+    yel = mat("geiger_yel", (0.95, 0.75, 0.1))
+    blk = mat("geiger_blk", (0.06, 0.06, 0.06))
+    box(f"{name}_body", (0.5, 0.3, 0.32), (0, 0, -0.2), yel, parent=root, coll=coll)
+    box(f"{name}_handle", (0.4, 0.08, 0.06), (0, 0, 0.0), blk, parent=root, coll=coll)
+    box(f"{name}_dial", (0.26, 0.02, 0.16), (0, -0.16, -0.18), mat("gauge", (0.95, 0.95, 0.9)), parent=root,
+        coll=coll)
+    needle = empty(f"{name}_needlePivot", (0, -0.18, -0.25), root, coll)
+    box(f"{name}_needle", (0.012, 0.01, 0.13), (0, 0, 0.065), mat("needle_red", (0.9, 0.1, 0.1)), parent=needle,
+        coll=coll)
+    needle.rotation_euler[1] = math.radians(-60)
+    wand = empty(f"{name}_wand", (0.4, -0.1, -0.2), root, coll)
+    cyl(f"{name}_wandtube", 0.05, 0.6, (0, -0.3, 0), blk, n=6, rot=(90, 0, 0), parent=wand, coll=coll)
+    return root, needle, wand
+
+
+def needle_swing(needle, start, end, lo=-60, hi=60, jitter=12, seed=0):
+    """Needle jumps from lo to pegged near hi, buzzing."""
+    rnd = random.Random(seed)
+    needle.rotation_euler[1] = math.radians(lo)
+    needle.keyframe_insert("rotation_euler", index=1, frame=start)
+    for f in range(start + 3, end + 1, 2):
+        needle.rotation_euler[1] = math.radians(hi + rnd.uniform(-jitter, jitter * 0.3))
+        needle.keyframe_insert("rotation_euler", index=1, frame=f)
+
+
+def make_beaker(name, loc, color=(0.4, 1.0, 0.3), h=0.5, coll=None, glow=2.0):
+    root = empty(name, loc, coll=coll)
+    cyl(f"{name}_glass", 0.16, h, (0, 0, h / 2), mat("beaker_glass", (0.75, 0.85, 0.9)), n=8, parent=root,
+        coll=coll)
+    cyl(f"{name}_liquid", 0.165, h * 0.6, (0, 0, h * 0.3), mat(f"liquid_{color}", color, emit=glow), n=8,
+        parent=root, coll=coll)
+    return root

@@ -30,12 +30,13 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 EPDIR = AUDIO = TRANSCRIPT = TIMING = RENDERS = FINAL = SCRIPT = NAME = None
 EP = None
 CUES, FIXES, PHRASE_FIXES, SAID, DEFAULTS, TITLE = [], {}, [], [], {}, "shot00_title"
+CAST = []
 
 
 def load_episode(name):
     """Point every path at episodes/<name>/ and load its episode.py config."""
     global EPDIR, AUDIO, TRANSCRIPT, TIMING, RENDERS, FINAL, SCRIPT, NAME, EP
-    global CUES, FIXES, PHRASE_FIXES, SAID, DEFAULTS, TITLE
+    global CUES, FIXES, PHRASE_FIXES, SAID, DEFAULTS, TITLE, CAST
     import importlib.util
     NAME = os.path.basename(os.path.normpath(name))
     EPDIR = os.path.join(REPO, "episodes", NAME)
@@ -46,6 +47,7 @@ def load_episode(name):
     FIXES = getattr(EP, "FIXES", {})
     PHRASE_FIXES = getattr(EP, "PHRASE_FIXES", [])
     SAID = getattr(EP, "SAID", [])
+    CAST = getattr(EP, "CAST", [])
     audio = [f for f in sorted(os.listdir(os.path.join(EPDIR, "audio")))
              if f.startswith("narration.")] if os.path.isdir(os.path.join(EPDIR, "audio")) else []
     AUDIO = os.path.join(EPDIR, "audio", audio[0] if audio else "narration.m4a")
@@ -180,6 +182,59 @@ def render_changed(timing):
             run([os.path.join(REPO, "tools", "render.sh"), os.path.join(EPDIR, "scenes", f"{shot}.py")])
 
 
+# ---------------------------------------------------------------- cast cards
+def find_phrase(words, phrase, start=0):
+    """(index, length) of the best transcript match for phrase at/after start."""
+    toks = [norm(w["w"]) for w in words]
+    target = [norm(t) for t in phrase.split()]
+    n = len(target)
+    best, bi = 0.0, None
+    for i in range(start, len(toks) - n + 1):
+        r = difflib.SequenceMatcher(None, toks[i:i + n], target).ratio()
+        if r > best:
+            best, bi = r, i
+    return (bi, n) if bi is not None and best >= 0.8 else (None, n)
+
+
+def cast_cards(words):
+    """Photo cards that pop up while a cast member is named. episode.py CAST:
+    (image under the repo, phrase where it appears, phrase where it goes or None,
+    extra seconds held after the start phrase when there is no end phrase)."""
+    cards, pos = [], 0
+    for img, phrase, until, hold in CAST:
+        i, n = find_phrase(words, phrase, pos)
+        if i is None:
+            print(f"!! cast card phrase not heard: '{phrase}'")
+            continue
+        a = words[i]["s"]
+        b = words[i + n - 1]["e"] + hold
+        if until:
+            j, _ = find_phrase(words, until, i)
+            if j is not None:
+                b = words[j]["s"]
+        pos = i + 1
+        cards.append((os.path.join(REPO, img), a, b))
+        print(f"   card {os.path.basename(img):22s} {a:6.2f}-{b:6.2f}s  '{phrase}'")
+    return cards
+
+
+def card_filters(cards, first_input, base="b0"):
+    """Filtergraph overlaying each card (slight tilt, cream border, 70s tint,
+    quick fade + slide up) on [base]. Returns (graph, output label)."""
+    g, cur = "", base
+    for k, (_, a, b) in enumerate(cards):
+        ang = (-3 if k % 2 else 3) * 3.14159 / 180
+        g += (f"[{first_input + k}:v]scale=860:860:force_original_aspect_ratio=decrease,"
+              "eq=saturation=0.85:contrast=0.95,colorbalance=rs=0.03:bs=-0.04:rh=0.04:bh=-0.05,"
+              "pad=iw+32:ih+32:16:16:color=0xEFE6D2,format=rgba,"
+              f"rotate={ang:.4f}:c=none:ow=rotw({ang:.4f}):oh=roth({ang:.4f}),"
+              f"fade=t=in:st={a:.2f}:d=0.12:alpha=1,fade=t=out:st={b - 0.12:.2f}:d=0.12:alpha=1[c{k}];"
+              f"[{cur}][c{k}]overlay=x=(W-w)/2:y='700-h/2+70*max(0,1-(t-{a:.2f})/0.18)'"
+              f":enable='between(t,{a:.2f},{b:.2f})'[o{k}];")
+        cur = f"o{k}"
+    return g, cur
+
+
 # ---------------------------------------------------------------- 4. captions + mux
 def ass_time(t):
     h, rem = divmod(max(0, t), 3600)
@@ -283,15 +338,23 @@ def main():
     write_captions(tr["words"], ass)
     out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, f"{NAME}.mp4")
     # 70s look: film grain goes on once here (cheaper than per shot)
-    look_file = os.path.join(RENDERS, CUES[0][0], "look")
-    film = os.path.exists(look_file) and open(look_file).read().strip() == "70s"
+    # render settings come from the first Blender-rendered shot (a shot built from reused
+    # footage writes look "clip" and is skipped)
+    ref = next((sh for sh in shots if os.path.exists(os.path.join(RENDERS, sh, "look"))
+                and open(os.path.join(RENDERS, sh, "look")).read().strip() != "clip"), CUES[0][0])
+    look_file = os.path.join(RENDERS, ref, "look")
+    # no per-shot settings on disk (render folders aren't committed): assume the house
+    # defaults the episode was rendered with (full HD, 70s look, 24 fps)
+    known = os.path.exists(look_file)
+    film = open(look_file).read().strip() == "70s" if known else True
     vf = "tpad=stop_mode=clone:stop_duration=3,"           # hold last frame to the end of the audio
     # chunky PS1-res grain that refreshes on twos (12 fps, like the animation):
     # full-res per-frame grain made a 300 MB file; this is ~70 MB
-    res_file = os.path.join(RENDERS, CUES[0][0], "res")
-    res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) else "270:480"
-    twos = open(os.path.join(RENDERS, CUES[0][0], "twos")).read().strip() == "1" \
-        if os.path.exists(os.path.join(RENDERS, CUES[0][0], "twos")) else True
+    res_file = os.path.join(RENDERS, ref, "res")
+    res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) \
+        else ("270:480" if known else "1080:1920")
+    twos = open(os.path.join(RENDERS, ref, "twos")).read().strip() == "1" \
+        if os.path.exists(os.path.join(RENDERS, ref, "twos")) else known
     hd = res == "1080:1920"
     if film and hd:
         # full HD: soft, light grain made at half res and overlaid (~22 MB reel)
@@ -302,9 +365,15 @@ def main():
         vf += (f"scale={res}:flags=neighbor,{'fps=12,' if twos else ''}noise=alls=5:allf=t,fps=24,"
                "scale=1080:1920:flags=neighbor,")
     vf += f"ass={ass}"
+    # cast photo cards go on before the grain and captions
+    cards = cast_cards(tr["words"])
+    hold, rest = vf.split(",", 1)                       # tpad, then grain + captions
+    cg, top = card_filters(cards, 2)
+    graph = f"[0:v]{hold}[b0];{cg}[{top}]{rest}[v]"
+    imgs = [x for c in cards for x in ("-loop", "1", "-framerate", str(FPS), "-i", c[0])]
     enc = ["-crf", "25" if hd else "24", "-preset", "medium"] if film else ["-crf", "20"]
-    run(["ffmpeg", "-loglevel", "error", "-y", "-i", body, "-i", AUDIO,
-         "-filter_complex", f"[0:v]{vf}[v]", "-map", "[v]", "-map", "1:a", "-shortest",
+    run(["ffmpeg", "-loglevel", "error", "-y", "-i", body, "-i", AUDIO, *imgs,
+         "-filter_complex", graph, "-map", "[v]", "-map", "1:a", "-shortest",
          "-c:v", "libx264", *enc, "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
          "-movflags", "+faststart", out])
     os.remove(body)

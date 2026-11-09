@@ -39,6 +39,24 @@ reference episode: copy its patterns.
    `episodes/jaws6/final/jaws6.mp4` (title + shots + narration + captions).
    Check frames at key lines against the transcript before sending.
 
+## Series so far (for recaps and continuity)
+
+- **Jaws 5**: a shark rams a ferry off Amity, a swarm attacks ("Shark 911").
+  Brody (Pedro Pascal) and oceanographer Jesse (Jesse Plemons, red beanie)
+  track them on radar to an egg cave under the Flying Horses carousel; Brody's
+  mechanical shark sub lures them with a giant ham, they blow the entrance,
+  drill through the carousel and pump the cave dry.
+- **Jaws 6**: opens with "Previously on Jaws 5" (reused Jaws 5 footage) and a
+  99% critics score. Fourth of July in Edgartown Harbor at dusk: a shark rams
+  the fireworks barge, it tips, rockets fire flat into the sailboats ("War of
+  1812", the anthem won't stop). The radar finds them under the harbor; same
+  plan as Jaws 5, cave under the bookstore. Twist: the sharks are
+  **radioactive mutants** (glowing green). Ends on the open question "where
+  are they coming from?": a green glow on the horizon. Sets up Jaws 7.
+- Episode patterns that worked: the title card plays under the intro line
+  when the narration starts at 0 s; a recap shot from earlier renders
+  (`shot01_recap.py`); cast cards on "played by ...".
+
 ## House style (current defaults, chosen by the owner)
 
 - **Full HD clean low-poly**: native 1080x1920, 24 fps, AA 8, soft shadows,
@@ -68,6 +86,18 @@ reference episode: copy its patterns.
   `radar_land`, `dot_line`, `radar_sweep`, `blink`), `underwater`,
   `make_cave_cutaway`, `make_bait`, `explosion`, `make_drill`, `make_pump`,
   `water_spray`.
+- `fireworks.py` (Jaws 6): `dusk(s)` night sky (call before `make_island` so
+  windows glow), `firework`, `burst`, `rocket_streak` (flat rockets),
+  `make_barge`, `fire` (flames + smoke + flicker light), `smoke_pall`,
+  `flash_light`. Keep spark emission low (~1.5) or colors clip to white.
+- `town.py` (Jaws 6): `make_bookstore`, `make_marquee`/`chase_bulbs`,
+  `make_sailboat`, `make_flag` (waving), `bunting`, `make_pa_pole`,
+  `music_notes`, `question_mark`, `light_bulb`, `pop_in`, `make_tomato`.
+- Radioactive: `make_shark(..., variant="rad")` (glowing green),
+  `props.make_rad_sign`, `make_geiger`/`needle_swing`, `make_beaker`.
+- Reusing old footage: `episodes/jaws6/scenes/shot01_recap.py` loads earlier
+  renders into Blender's sequencer and sets `LOOK = "clip"` so it isn't
+  graded twice.
 - `common.py`: scene/camera (`reset_scene`, `add_sun`, `add_camera`,
   `key_camera`, `add_shake`), `mat` (look-aware), `box/cyl/ico/text/decal`,
   `pixel_mat` (ASCII-art textures), `shot_seconds`, `render`.
@@ -81,7 +111,8 @@ reference episode: copy its patterns.
   phrases. Ask the owner about unclear phrases and fix them with `SAID`.
 - **Cue matching** tries the transcript first, then the script. Check the
   printed `@ time 'words'` lines; nudge with the third CUES value.
-- **Render time**: full HD is ~4 s/frame (CPU, no GPU), ~2.5 h per episode.
+- **Render time**: full HD is ~3–4 s/frame (CPU, no GPU), ~2–2.5 h per
+  episode (Jaws 6: 18 shots in 1 h 45 min; night shots with many lights ~3 s/frame).
   Cloud background jobs are killed at **2 h**: `render_all.sh` resumes
   (skips finished shots); split long shots with `JAWS_RANGE=1-110`,
   `JAWS_RANGE=111-999`, then `JAWS_ENCODE_ONLY=1` (each step < 10 min).
@@ -95,12 +126,20 @@ reference episode: copy its patterns.
 - Key event frames proportionally to the shot length (`int(F * 0.4)`), since
   lengths change when retimed to the narration.
 - Grain is expensive to compress: keep it light (HD reel ≈ 26 MB).
-- Don't put real people's likenesses or real brands (e.g. ferry company
-  logos) in the video; the characters are generic blocky figures.
+- The 3D characters stay generic blocky figures, and no real brands (e.g.
+  ferry company logos) in the 3D scenes. Exception, chosen by the owner:
+  **cast photo cards**. When the narration names the cast ("Police Chief
+  Brody, played by Pedro Pascal", "Jesse, played by Jesse Plemons"), the
+  owner's photos in `assets/cast/` pop up as tilted cards (original 1975
+  Brody on "Police Chief Brody", then the actor on "played by ..."). The
+  same cards work for any image on a line (Jaws 6: a War of 1812 painting
+  on "friggin' War of 1812"). Set them
+  in `CAST` in `episode.py`; `assemble.py` overlays them (no re-render).
 
 ## Environment
 
-Cloud environment "Jaws": Blender 4.0 + xvfb (apt), `openai-whisper` (pip),
+Cloud environment "Jaws": Blender 4.0 + xvfb (apt), `openai-whisper` (pip;
+if `import whisper` fails at session start, `pip install openai-whisper`),
 network access to `openaipublic.azureedge.net` for Whisper model weights
 (Hugging Face and download.blender.org are blocked). Use `xvfb-run` (faster
 than pure background mode). Commit and push finished renders and finals:

@@ -1,6 +1,6 @@
 """Great white shark (and its mechanical twin), built from code.
 
-    s = make_shark("Shark01", loc=(0,0,0), variant="real" | "mech", scale=1)
+    s = make_shark("Shark01", loc=(0,0,0), variant="real" | "mech" | "rad", scale=1)
     s.root        -> empty to move/rotate the whole shark (faces +X)
     s.jaw         -> pivot, rotate Y to open:  open_jaw(s, frame, amount)
     s.tail        -> pivot, wags on Z:         swim_wag(s, start, end)
@@ -43,6 +43,15 @@ def _palette(variant):
             rivet=mat("mech_rivet", (0.62, 0.62, 0.60), rough=0.4, metal=0.8),
             glass=mat("porthole_glow", (1.0, 0.82, 0.3), emit=6.0),
             frame=mat("porthole_frame", (0.72, 0.55, 0.22), rough=0.4, metal=0.9),
+        )
+    if variant == "rad":      # radioactive mutant: sickly green, glowing belly and eyes
+        return dict(
+            back=mat("rad_back", (0.12, 0.45, 0.10), emit=0.6),
+            belly=mat("rad_belly", (0.5, 1.0, 0.25), emit=3.0),
+            mouth=mat("rad_mouth", (0.35, 0.9, 0.2), emit=2.0),
+            teeth=mat("rad_teeth", (0.9, 1.0, 0.7), emit=1.0),
+            eye=mat("rad_eye", (0.7, 1.0, 0.2), emit=8.0),
+            gill=mat("rad_gill", (0.5, 1.0, 0.3), emit=3.0),
         )
     return dict(
         back=mat("shark_back", (0.36, 0.44, 0.54)),
