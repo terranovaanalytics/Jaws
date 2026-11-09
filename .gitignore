@@ -1,7 +1,8 @@
-renders/*/
-renders/*_j[0-9].mp4
-final/_*
-audio/*.transcript.json
+episodes/*/renders/*/
+episodes/*/renders/*_j[0-9].mp4
+episodes/*/renders/.render_since
+episodes/*/final/_*
+episodes/*/audio/*.transcript.json
+tests/renders/*/
 __pycache__/
 *.blend1
-tools/.render_since

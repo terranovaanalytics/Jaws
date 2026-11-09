@@ -1,7 +1,7 @@
 """Shot 13: the big pump. Water blasts out of the top of the carousel like a
 fountain, Brody and Jesse admire their work... one shark comes out too."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake, linear_keys,
                          render, FPS, shot_seconds, box, mat)
 from jaws.props import make_carousel, make_pump, water_spray

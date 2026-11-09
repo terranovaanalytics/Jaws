@@ -1,6 +1,6 @@
 """Model test: carousel, drill, pump, bait (and radar in a second still via JAWS_TEST=radar)."""
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, box, mat, render
 from jaws.props import (make_carousel, make_drill, make_pump, make_bait, make_radar,
                         radar_land, dot_line, radar_sweep)

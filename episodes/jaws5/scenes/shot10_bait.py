@@ -1,7 +1,7 @@
 """Shot 10: inside the cave. Brody's mech shark cruises in, opens its jaw and
 spits out a giant ham. Every shark in the cave rushes in for a frenzy."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake, linear_keys,
                          render, FPS, shot_seconds)
 from jaws.props import make_cave_cutaway, make_bait

@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
-# Render one scene script headlessly and upscale to 1080x1920 (nearest
-# neighbor = chunky PS1 pixels).
-#   tools/render.sh scenes/shot01_establishing.py
-#   JAWS_JANK=2 tools/render.sh scenes/shot02_ferry_rammed.py   (jank level 0-3)
-# Output: renders/<scene>.mp4 (animation) or renders/<scene>.png (still)
+# Render one scene script headlessly at 1080x1920 (lower internal res is
+# nearest-neighbor upscaled when JAWS_PIXEL_SCALE > 1).
+#   tools/render.sh episodes/jaws5/scenes/shot01_establishing.py
+#   JAWS_JANK=1 tools/render.sh ...   (jank level 0-3; 0 = clean full HD, the default)
+# Output: episodes/<ep>/renders/<scene>.mp4 (animation) or .png (still)
 # Knobs: JAWS_PIXEL_SCALE=1..4 (1 = native 1080x1920), JAWS_SNAP=0/1 (vertex wobble),
 #        JAWS_AA=1..16 (anti-aliasing samples), JAWS_COLORS=0|N (dithered palette),
 #        JAWS_TWOS=0/1 (12 fps animation), JAWS_LOOK=sunny|70s
-# Quick check: JAWS_FRAMES=1,72,144 tools/render.sh scenes/shot01_establishing.py
+# Quick check: JAWS_FRAMES=1,72,144 tools/render.sh episodes/jaws5/scenes/shot01_establishing.py
 # JAWS_SUFFIX=_j2 appends to the output name (for side-by-side comparisons).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-scene="$1"; name="$(basename "$scene" .py)${JAWS_SUFFIX:-}"; out="renders/$name"
+scene="$1"; name="$(basename "$scene" .py)${JAWS_SUFFIX:-}"
+# output goes next to the scene's folder: episodes/<ep>/scenes/x.py -> episodes/<ep>/renders/
+epdir="$(dirname "$(dirname "$scene")")"; out="$epdir/renders/$name"
+export JAWS_EPISODE_DIR="$epdir"
 # Long shots can be rendered in parts, then encoded:
 #   JAWS_RANGE=1-110 tools/render.sh S; JAWS_RANGE=111-999 tools/render.sh S; JAWS_ENCODE_ONLY=1 tools/render.sh S
 if [ -z "${JAWS_RANGE:-}" ] && [ -z "${JAWS_ENCODE_ONLY:-}" ]; then rm -rf "$out"; fi
@@ -46,12 +49,12 @@ if [ -n "${JAWS_FRAMES:-}" ]; then
   done
   echo "-> $out/preview_*_big.png"
 elif [ -f "$out/still.png" ]; then
-  ffmpeg -loglevel error -y -i "$out/still.png" -vf "$grade,$up,$film" "renders/$name.png"
-  echo "-> renders/$name.png"
+  ffmpeg -loglevel error -y -i "$out/still.png" -vf "$grade,$up,$film" "$epdir/renders/$name.png"
+  echo "-> $epdir/renders/$name.png"
 else
   n=$(ls "$out"/f_*.png | wc -l)
   rate=24; [ "$(cat "$out/twos" 2>/dev/null || echo 0)" = "1" ] && rate=12   # rendered on twos
   ffmpeg -loglevel error -y -framerate $rate -pattern_type glob -i "$out/f_*.png" \
-    -vf "$grade,$pre,$up,$film,$post,fps=24" -c:v libx264 -pix_fmt yuv420p -crf 18 "renders/$name.mp4"
-  echo "-> renders/$name.mp4 ($n frames rendered, jank $jank)"
+    -vf "$grade,$pre,$up,$film,$post,fps=24" -c:v libx264 -pix_fmt yuv420p -crf 18 "$epdir/renders/$name.mp4"
+  echo "-> $epdir/renders/$name.mp4 ($n frames rendered, jank $jank)"
 fi

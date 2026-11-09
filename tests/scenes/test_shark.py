@@ -1,6 +1,6 @@
 """Model test: great white (jaw open) + mech sub behind it."""
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, box, mat, render
 from jaws.shark import make_shark, open_jaw
 

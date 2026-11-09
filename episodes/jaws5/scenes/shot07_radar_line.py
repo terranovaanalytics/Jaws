@@ -1,7 +1,7 @@
 """Shot 7: the advanced radar detection shows a line of blinking dots
 marching toward Amity. Brody and Jesse watch from the foreground."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, key_camera, render, FPS, shot_seconds, box, mat
 from jaws.props import make_radar, radar_land, radar_sweep, dot_line
 from jaws.people import make_brody, make_jesse

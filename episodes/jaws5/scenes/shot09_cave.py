@@ -1,7 +1,7 @@
 """Shot 9: cutaway diagram. Tilt down from the Flying Horses carousel, through
 the dirt, into a giant underwater cave packed with circling sharks."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, render, FPS, shot_seconds,
                          text, mat, box)
 from jaws.props import make_carousel, animate_carousel, make_cave_cutaway

@@ -1,7 +1,7 @@
 """Shot 11: outside the cave mouth. The mech sub zips away, the dynamite
 blinks... KABOOM. Boulders crash down and seal the entrance."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_camera, key_camera, add_shake, linear_keys, render, FPS,
                          shot_seconds, box, cyl, mat)
 from jaws.props import underwater, explosion, blink

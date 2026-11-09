@@ -543,10 +543,10 @@ def text(name, body, loc=(0, 0, 0), size=1.0, material=None, rot=(90, 0, 0),
 
 
 def shot_seconds(shot, default):
-    """Shot length: from timing.json (written by tools/assemble.py from the
+    """Shot length: from the episode's timing.json (written by tools/assemble.py from the
     narration timestamps) when present, else the scene's default."""
     import json
-    p = os.path.join(REPO, "timing.json")
+    p = os.path.join(os.environ.get("JAWS_EPISODE_DIR", REPO), "timing.json")
     if os.path.exists(p):
         with open(p) as fh:
             data = json.load(fh)

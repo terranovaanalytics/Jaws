@@ -1,7 +1,7 @@
 """Shot 3: shark swarm. Dozens of fins circle the sinking ferry; a couple of
 swimmers get gobbled. High camera slowly orbits in."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, key_camera, render, FPS, shot_seconds
 from jaws.world import make_ocean, make_island, make_ferry, bob, make_extra, splash
 from jaws.shark import make_shark, swim_wag, open_jaw

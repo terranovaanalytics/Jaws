@@ -1,7 +1,7 @@
 """Shot 8: underwater. A single-file line of great whites... and one of them
 is Brody's riveted mechanical shark sub with a glowing porthole."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import reset_scene, add_camera, key_camera, linear_keys, render, FPS, shot_seconds
 from jaws.props import underwater
 from jaws.shark import make_shark, swim_wag

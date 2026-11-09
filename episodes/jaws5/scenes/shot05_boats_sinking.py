@@ -1,7 +1,7 @@
 """Shot 5: the flotilla gets bumped. Sharks breach under boats, the boats
 flip, splash and sink. Shaky cam on each hit."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake, linear_keys,
                          render, FPS, shot_seconds)
 from jaws.world import make_ocean, make_island, make_small_boat, bob, make_extra, splash

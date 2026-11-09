@@ -1,7 +1,7 @@
 """Shot 6: chief oceanographer Jesse arrives on the Amity dock. Red beanie in
 summer. Walks up, stops, slow push-in, he looks at the camera."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, linear_keys, render,
                          FPS, shot_seconds, box, mat, text)
 from jaws.world import make_ocean, make_island, make_small_boat, bob, make_gull, flap

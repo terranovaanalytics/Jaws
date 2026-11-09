@@ -1,7 +1,7 @@
 """Shot 14: the radar goes quiet. Silence... then beep beep beep: a NEW line
 of dots heading straight for Edgartown Harbor. Crash zoom."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, key_camera, render, FPS, shot_seconds, box, mat
 from jaws.props import make_radar, radar_land, radar_sweep, dot_line
 from jaws.people import make_brody, make_jesse

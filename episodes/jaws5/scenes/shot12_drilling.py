@@ -2,7 +2,7 @@
 kicked off and run, a drill rig drops from the sky, Brody and Jesse drill
 straight through the carousel floor."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake, linear_keys,
                          render, FPS, shot_seconds, box, mat)
 from jaws.props import make_carousel, animate_carousel, make_drill

@@ -1,7 +1,7 @@
 """Shot 2: a shark fin zooms in, the shark breaches and rams the ferry.
 Impact shake, splash, passengers tumble off, ferry lists and starts sinking."""
 import math, os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake,
                          linear_keys, render, FPS, JANK, box, mat, shot_seconds)
 from jaws.world import (make_ocean, make_island, make_ferry, bob, make_extra, splash,

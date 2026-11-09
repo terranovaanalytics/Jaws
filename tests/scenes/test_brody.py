@@ -1,6 +1,6 @@
 """Model test: Chief Brody (and Jesse next to him for scale)."""
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, box, mat, render
 from jaws.people import make_brody, make_jesse
 import math

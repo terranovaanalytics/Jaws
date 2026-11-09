@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 """Assemble the final Jaws 5 reel.
 
-    python3 tools/assemble.py            # full pipeline (needs audio/jaws5.m4a)
-    python3 tools/assemble.py --render   # also re-render shots whose length changed
-    python3 tools/assemble.py --silent   # no audio yet: stitch a silent draft
+    python3 tools/assemble.py jaws5 --render   # full pipeline for episodes/jaws5/
+    python3 tools/assemble.py jaws5            # re-assemble only (no re-render)
+    python3 tools/assemble.py jaws6 --silent   # no audio yet: stitch a silent draft
+
+Per-episode inputs (episodes/<name>/): script.md, audio/narration.*,
+episode.py (CUES, caption FIXES/SAID, DEFAULTS, WHISPER_PROMPT), scenes/.
 
 Steps (with audio):
   1. Transcribe the narration with Whisper (word timestamps), cached in
@@ -12,7 +15,7 @@ Steps (with audio):
      timing.json, which every scene reads for its length.
   3. Optionally re-render shots whose length changed (--render).
   4. Title card + shots -> one video, narration as the audio, burned-in
-     captions, -> final/jaws5.mp4
+     captions, -> episodes/<name>/final/<name>.mp4
 """
 import argparse
 import difflib
@@ -23,44 +26,35 @@ import subprocess
 import sys
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-AUDIO = os.path.join(REPO, "audio", "jaws5.m4a")
-TRANSCRIPT = os.path.join(REPO, "audio", "transcript.json")
-TIMING = os.path.join(REPO, "timing.json")
-RENDERS = os.path.join(REPO, "renders")
-FINAL = os.path.join(REPO, "final")
+# Set by load_episode(): everything for one episode lives in episodes/<name>/
+EPDIR = AUDIO = TRANSCRIPT = TIMING = RENDERS = FINAL = SCRIPT = NAME = None
+EP = None
+CUES, FIXES, PHRASE_FIXES, SAID, DEFAULTS, TITLE = [], {}, [], [], {}, "shot00_title"
+
+
+def load_episode(name):
+    """Point every path at episodes/<name>/ and load its episode.py config."""
+    global EPDIR, AUDIO, TRANSCRIPT, TIMING, RENDERS, FINAL, SCRIPT, NAME, EP
+    global CUES, FIXES, PHRASE_FIXES, SAID, DEFAULTS, TITLE
+    import importlib.util
+    NAME = os.path.basename(os.path.normpath(name))
+    EPDIR = os.path.join(REPO, "episodes", NAME)
+    spec = importlib.util.spec_from_file_location(f"episode_{NAME}", os.path.join(EPDIR, "episode.py"))
+    EP = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(EP)
+    CUES, TITLE, DEFAULTS = EP.CUES, EP.TITLE, EP.DEFAULTS
+    FIXES = getattr(EP, "FIXES", {})
+    PHRASE_FIXES = getattr(EP, "PHRASE_FIXES", [])
+    SAID = getattr(EP, "SAID", [])
+    audio = [f for f in sorted(os.listdir(os.path.join(EPDIR, "audio")))
+             if f.startswith("narration.")] if os.path.isdir(os.path.join(EPDIR, "audio")) else []
+    AUDIO = os.path.join(EPDIR, "audio", audio[0] if audio else "narration.m4a")
+    TRANSCRIPT = os.path.join(EPDIR, "audio", "transcript.json")
+    TIMING = os.path.join(EPDIR, "timing.json")
+    RENDERS = os.path.join(EPDIR, "renders")
+    FINAL = os.path.join(EPDIR, "final")
+    SCRIPT = os.path.join(EPDIR, "script.md")
 FPS = 24
-
-# shot -> phrase from scripts/jaws5.md where the shot should start.
-# Edit these if a shot should land on a different line.
-# (shot, phrase where the shot starts, nudge in seconds). Phrases are matched
-# against what was actually SAID first (the recording ad-libs), then against
-# scripts/jaws5.md. Avoid "shark" in cues: Whisper often hears it as "shock".
-CUES = [
-    ("shot01_establishing", "we're gonna start with jaws 5", 0),
-    ("shot02_ferry_rammed", "a steamship authority ferry", 0),
-    ("shot03_swarm", "people hit the water", 0),
-    ("shot04_flotilla", "police chief brody still alive", 0),
-    ("shot05_boats_sinking", "most of them get rammed and sunk", 0),
-    ("shot06_jesse_arrives", "it makes national news", 0),
-    ("shot07_radar_line", "he brings an advanced radar", 0),
-    ("shot08_mech_in_line", "so police chief brody builds", 0),
-    ("shot09_cave", "blends in and follows the", 0.8),
-    ("shot10_bait", "they hatch a plan", 0),
-    ("shot11_explosion", "blow up the cave entrance", 0),
-    ("shot12_drilling", "then kick the kids off", 1.0),
-    ("shot13_pump", "it's a crazy plan", 0),
-    ("shot14_radar_again", "the radar goes quiet", 0),
-    ("shot15_endcard", "and that leads us to jaws", 0),
-]
-# Caption fixes for words Whisper reliably mishears in this recording.
-FIXES = {"shock": "shark", "shocks": "sharks", "shock's": "shark's", "edgerton": "Edgartown",
-         "edgertown": "Edgartown",
-         "zazu": "Zissou"}
-PHRASE_FIXES = [(r"\b9\s*-\s*11\b", "911")]
-# Whole-phrase corrections from the narrator: (what Whisper heard, what was said).
-# Timing of the misheard span is spread evenly over the corrected words.
-SAID = [("and the story's a heroine.", "and stories are harrowing.")]
-
 
 def apply_said(words):
     words = list(words)
@@ -75,13 +69,6 @@ def apply_said(words):
                 words[i:i + n] = [dict(w=t, s=s0 + k * step, e=s0 + (k + 1) * step) for k, t in enumerate(new)]
                 break
     return words
-TITLE = "shot00_title"
-DEFAULTS = {TITLE: 3.0, "shot15_endcard": 3.5, "shot01_establishing": 6, "shot02_ferry_rammed": 7, "shot03_swarm": 7,
-            "shot04_flotilla": 7, "shot05_boats_sinking": 7, "shot06_jesse_arrives": 6,
-            "shot07_radar_line": 6, "shot08_mech_in_line": 7, "shot09_cave": 6, "shot10_bait": 6,
-            "shot11_explosion": 6, "shot12_drilling": 7, "shot13_pump": 6, "shot14_radar_again": 8}
-
-
 def run(cmd, **kw):
     print("+", " ".join(cmd) if isinstance(cmd, list) else cmd, flush=True)
     subprocess.run(cmd, check=True, **kw)
@@ -99,10 +86,7 @@ def transcribe():
     import whisper
     model = whisper.load_model("medium.en")   # small.en heard "shark" as "shock"
     res = model.transcribe(AUDIO, word_timestamps=True, language="en",
-                           initial_prompt="Jaws 5. Great white sharks. Shark 911 on Amity Island. Police Chief Brody, "
-                                          "played by Pedro Pascal. Chief oceanographer Jesse, played by Jesse Plemons, "
-                                          "wears a Steve Zissou red cap. Mechanical shark submarine. Shark cave under "
-                                          "the Flying Horses carousel. Edgartown Harbor.")
+                           initial_prompt=EP.WHISPER_PROMPT)
     words = [dict(w=w["word"].strip(), s=w["start"], e=w["end"])
              for seg in res["segments"] for w in seg.get("words", [])]
     out = dict(text=res["text"], words=words, duration=words[-1]["e"] if words else 0)
@@ -116,7 +100,7 @@ def find_cues(words):
     """Align the whole script to the transcript, then look up where each cue
     phrase (found in the script text) was actually spoken. Robust to Whisper
     mishearing a few words and to the narrator ad-libbing."""
-    with open(os.path.join(REPO, "scripts", "jaws5.md")) as fh:
+    with open(SCRIPT) as fh:
         script = [norm(t) for t in fh.read().split()]
     script = [t for t in script if t]
     toks = [norm(w["w"]) for w in words]
@@ -147,7 +131,7 @@ def find_cues(words):
             if r > best:
                 best, best_i = r, i
         if best_i is None or best < 0.6:
-            print(f"!! cue for {shot} not found in scripts/jaws5.md: '{phrase}'")
+            print(f"!! cue for {shot} not found in script.md: '{phrase}'")
             continue
         pos = best_i + 1
         # first script word of the cue that was matched in the transcript
@@ -193,7 +177,7 @@ def render_changed(timing):
         have = rendered_seconds(shot)
         want = int(timing.get(shot, DEFAULTS[shot]) * FPS) / FPS
         if have is None or abs(have - want) > 0.1:
-            run([os.path.join(REPO, "tools", "render.sh"), os.path.join(REPO, "scenes", f"{shot}.py")])
+            run([os.path.join(REPO, "tools", "render.sh"), os.path.join(EPDIR, "scenes", f"{shot}.py")])
 
 
 # ---------------------------------------------------------------- 4. captions + mux
@@ -257,11 +241,13 @@ def concat(shots, out):
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("episode", help="episode folder name under episodes/, e.g. jaws5")
     ap.add_argument("--render", action="store_true", help="re-render shots whose length changed")
     ap.add_argument("--silent", action="store_true", help="no audio: silent draft with default timings")
-    ap.add_argument("--audio", help="narration file (default audio/jaws5.m4a)")
-    ap.add_argument("--out", help="output file (default final/jaws5.mp4)")
+    ap.add_argument("--audio", help="narration file (default episodes/<name>/audio/narration.*)")
+    ap.add_argument("--out", help="output file (default episodes/<name>/final/<name>.mp4)")
     a = ap.parse_args()
+    load_episode(a.episode)
     global AUDIO, TRANSCRIPT
     if a.audio:
         AUDIO = os.path.abspath(a.audio)
@@ -271,10 +257,10 @@ def main():
 
     if a.silent or not os.path.exists(AUDIO):
         if not a.silent:
-            print("!! audio/jaws5.m4a not found, making a silent draft (use --silent to skip this note)")
+            print("!! audio/narration.* not found, making a silent draft (use --silent to skip this note)")
         if a.render:
             render_changed({})
-        out = os.path.join(FINAL, "jaws5_draft_silent.mp4")
+        out = os.path.join(FINAL, f"{NAME}_draft_silent.mp4")
         concat(shots, out)
         print("->", out)
         return
@@ -295,17 +281,17 @@ def main():
     concat(shots, body)
     ass = os.path.join(FINAL, "captions.ass")
     write_captions(tr["words"], ass)
-    out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, "jaws5.mp4")
+    out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, f"{NAME}.mp4")
     # 70s look: film grain goes on once here (cheaper than per shot)
-    look_file = os.path.join(RENDERS, "shot01_establishing", "look")
+    look_file = os.path.join(RENDERS, CUES[0][0], "look")
     film = os.path.exists(look_file) and open(look_file).read().strip() == "70s"
     vf = "tpad=stop_mode=clone:stop_duration=3,"           # hold last frame to the end of the audio
     # chunky PS1-res grain that refreshes on twos (12 fps, like the animation):
     # full-res per-frame grain made a 300 MB file; this is ~70 MB
-    res_file = os.path.join(RENDERS, "shot01_establishing", "res")
+    res_file = os.path.join(RENDERS, CUES[0][0], "res")
     res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) else "270:480"
-    twos = open(os.path.join(RENDERS, "shot01_establishing", "twos")).read().strip() == "1" \
-        if os.path.exists(os.path.join(RENDERS, "shot01_establishing", "twos")) else True
+    twos = open(os.path.join(RENDERS, CUES[0][0], "twos")).read().strip() == "1" \
+        if os.path.exists(os.path.join(RENDERS, CUES[0][0], "twos")) else True
     hd = res == "1080:1920"
     if film and hd:
         # full HD: soft, light grain made at half res and overlaid (~22 MB reel)

@@ -1,7 +1,7 @@
 """Shot 4: Chief Brody leads a flotilla of tiny boats out of Amity Harbor,
 Dunkirk style, pointing heroically out to sea. Camera tracks alongside."""
 import math, os, random, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import reset_scene, add_sun, add_camera, key_camera, linear_keys, render, FPS, shot_seconds
 from jaws.world import make_ocean, make_island, make_small_boat, bob, make_extra
 from jaws.people import make_brody

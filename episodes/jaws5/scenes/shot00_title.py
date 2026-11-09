@@ -1,6 +1,6 @@
 """Title card: big chunky red "JAWS 5" rises out of the ocean while a fin circles."""
 import os, sys
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
 from jaws.common import render, FPS, shot_seconds
 from jaws.title import build_title
 
