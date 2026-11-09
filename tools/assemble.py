@@ -57,6 +57,24 @@ FIXES = {"shock": "shark", "shocks": "sharks", "shock's": "shark's", "edgerton":
          "edgertown": "Edgartown",
          "zazu": "Zissou"}
 PHRASE_FIXES = [(r"\b9\s*-\s*11\b", "911")]
+# Whole-phrase corrections from the narrator: (what Whisper heard, what was said).
+# Timing of the misheard span is spread evenly over the corrected words.
+SAID = [("and the story's a heroine.", "and stories are harrowing.")]
+
+
+def apply_said(words):
+    words = list(words)
+    for heard, said in SAID:
+        h = [norm(t) for t in heard.split()]
+        n = len(h)
+        for i in range(len(words) - n + 1):
+            if [norm(w["w"]) for w in words[i:i + n]] == h:
+                s0, e0 = words[i]["s"], words[i + n - 1]["e"]
+                new = said.split()
+                step = (e0 - s0) / len(new)
+                words[i:i + n] = [dict(w=t, s=s0 + k * step, e=s0 + (k + 1) * step) for k, t in enumerate(new)]
+                break
+    return words
 TITLE = "shot00_title"
 DEFAULTS = {TITLE: 3.0, "shot15_endcard": 3.5, "shot01_establishing": 6, "shot02_ferry_rammed": 7, "shot03_swarm": 7,
             "shot04_flotilla": 7, "shot05_boats_sinking": 7, "shot06_jesse_arrives": 6,
@@ -205,6 +223,7 @@ Style: Cap,DejaVu Sans,86,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,-1,0,0,0,1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
+    words = apply_said(words)
     lines, chunk = [], []
 
     def flush():
