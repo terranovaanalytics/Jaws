@@ -45,3 +45,12 @@ WHISPER_PROMPT = ("Jaws 6. Great white sharks. Shark 911. Rotten Tomatoes score 
                   "fireworks barge in Edgartown Harbor. Police Chief Brody, played by Pedro Pascal. "
                   "Chief oceanographer Jesse, played by Jesse Plemons. Mechanical shark sub. "
                   "Edgartown Bookstore. Radioactive mutant sharks.")
+
+# Cast photo cards (assets/cast/): (image, phrase where it pops up, phrase where it
+# goes or None, seconds held after the phrase). The original 1975 Brody on "Police
+# Chief Brody", then the actor on "played by ...".
+CAST = [
+    ("assets/cast/brody_1975.jpg", "police chief brody played by", "played by pedro", 0),
+    ("assets/cast/pedro_pascal.jpg", "played by pedro pascal", None, 0.5),
+    ("assets/cast/jesse_plemons.jpg", "played by jesse plemons", None, 0.5),
+]

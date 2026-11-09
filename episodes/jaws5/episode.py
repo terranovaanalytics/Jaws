@@ -43,3 +43,12 @@ WHISPER_PROMPT = ("Jaws 5. Great white sharks. Shark 911 on Amity Island. Police
                   "played by Pedro Pascal. Chief oceanographer Jesse, played by Jesse Plemons, "
                   "wears a Steve Zissou red cap. Mechanical shark submarine. Shark cave under "
                   "the Flying Horses carousel. Edgartown Harbor.")
+
+# Cast photo cards (assets/cast/): (image, phrase where it pops up, phrase where it
+# goes or None, seconds held after the phrase). The original 1975 Brody on "Police
+# Chief Brody", then the actor on "played by ...".
+CAST = [
+    ("assets/cast/brody_1975.jpg", "police chief brody still alive", "played by pedro", 0),
+    ("assets/cast/pedro_pascal.jpg", "played by pedro pascal", None, 0.5),
+    ("assets/cast/jesse_plemons.jpg", "played by jesse plemons", None, 0.5),
+]

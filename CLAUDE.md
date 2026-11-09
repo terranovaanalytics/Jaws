@@ -107,8 +107,13 @@ reference episode: copy its patterns.
 - Key event frames proportionally to the shot length (`int(F * 0.4)`), since
   lengths change when retimed to the narration.
 - Grain is expensive to compress: keep it light (HD reel ≈ 26 MB).
-- Don't put real people's likenesses or real brands (e.g. ferry company
-  logos) in the video; the characters are generic blocky figures.
+- The 3D characters stay generic blocky figures, and no real brands (e.g.
+  ferry company logos) in the 3D scenes. Exception, chosen by the owner:
+  **cast photo cards**. When the narration names the cast ("Police Chief
+  Brody, played by Pedro Pascal", "Jesse, played by Jesse Plemons"), the
+  owner's photos in `assets/cast/` pop up as tilted cards (original 1975
+  Brody on "Police Chief Brody", then the actor on "played by ..."). Set them
+  in `CAST` in `episode.py`; `assemble.py` overlays them (no re-render).
 
 ## Environment
 
