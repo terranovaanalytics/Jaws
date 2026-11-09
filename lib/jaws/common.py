@@ -14,20 +14,21 @@ FPS = 24
 OUT_W, OUT_H = 1080, 1920
 # LOOK: "sunny" = original bright palette | "70s" = hazy late-afternoon,
 # muted olive/teal/amber palette, warm low sun (tools/render.sh adds the grade)
-LOOK = os.environ.get("JAWS_LOOK", "sunny")
+LOOK = os.environ.get("JAWS_LOOK", "70s")
 AMBIENT = 0.25      # dim sky fill on objects
 SELF_LIT = 0.40     # share of flat self-lit color in every material
-# JANK: 0 clean low-poly | 1 PS1 hardware (12fps, vertex wobble, low res,
+# JANK: 0 clean full-HD low-poly (AA, AO, bloom) | 1 PS1 hardware (12fps, vertex wobble, low res,
 # dithered palette) | 2 + fog/pop-in, ragdolls, CRT/VHS | 3 + deliberate bugs
-JANK = int(os.environ.get("JAWS_JANK", "1"))   # project default: 1
+JANK = int(os.environ.get("JAWS_JANK", "0"))   # project default: 0 = clean full HD
 # A scene can opt into another level by putting
 #   os.environ.setdefault("JAWS_JANK", "2")
 # at its top, before importing jaws.*
-PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "4" if JANK >= 1 else "3"))
+PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "4" if JANK >= 1 else "1"))
 # Individual knobs (default from JANK; override any one with an env var):
 SNAP = int(os.environ.get("JAWS_SNAP", "1" if JANK >= 1 else "0"))      # PS1 vertex wobble
 TWOS = int(os.environ.get("JAWS_TWOS", "1" if JANK >= 1 else "0"))      # animate on twos
-AA = int(os.environ.get("JAWS_AA", "1"))                                  # EEVEE samples (1 = jaggies)
+AA = int(os.environ.get("JAWS_AA", "1" if JANK >= 1 else "8"))           # EEVEE samples (1 = jaggies)
+HD = PIXEL_SCALE == 1 and JANK == 0      # polish: crisp shadows, AO, bloom
 # (palette size is JAWS_COLORS in tools/render.sh: 48 at jank>=1, 0 = off)
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -70,6 +71,17 @@ def reset_scene(frames=1, world_color=(0.45, 0.72, 0.95)):
     ee.shadow_cascade_size = "1024"
     ee.use_gtao = False
     ee.use_bloom = False
+    if HD:                                          # full-HD polish
+        ee.shadow_cube_size = "2048"
+        ee.shadow_cascade_size = "4096"
+        ee.use_soft_shadows = True
+        ee.use_gtao = True
+        ee.gtao_distance = 1.5
+        ee.gtao_factor = 0.8
+        ee.use_bloom = True
+        ee.bloom_threshold = 1.0
+        ee.bloom_intensity = 0.04
+        ee.bloom_radius = 5.0
     s["world_color"] = list(world_color)
     w = bpy.data.worlds.new("World")
     s.world = w
@@ -100,7 +112,7 @@ def add_sun(rot_deg=(50, 10, 35), energy=2.2, color=(1, 0.97, 0.9)):
     d = bpy.data.lights.new("Sun", "SUN")
     d.energy = energy
     d.color = color
-    d.angle = 0.0
+    d.angle = math.radians(1.5) if HD else 0.0     # slightly soft shadow edges in HD
     o = bpy.data.objects.new("Sun", d)
     o.rotation_euler = [math.radians(a) for a in rot_deg]
     bpy.context.scene.collection.objects.link(o)
@@ -516,6 +528,7 @@ def text(name, body, loc=(0, 0, 0), size=1.0, material=None, rot=(90, 0, 0),
     o = bpy.data.objects.new(name, cu)
     o.location = loc
     o.rotation_euler = [math.radians(a) for a in rot]
+    o.visible_shadow = False            # labels must not cast ghost copies
     return link(o, parent, coll)
 
 

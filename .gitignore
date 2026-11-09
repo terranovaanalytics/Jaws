@@ -4,3 +4,4 @@ final/_*
 audio/*.transcript.json
 __pycache__/
 *.blend1
+tools/.render_since

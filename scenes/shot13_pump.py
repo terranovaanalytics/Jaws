@@ -14,6 +14,8 @@ add_sun((45, 0, -30), energy=2.4)
 box("Ground", (200, 200, 1), (0, 0, -0.5), mat("grass", (0.30, 0.72, 0.25)))
 c = make_carousel()
 pump, nozzle = make_pump(loc=(0, 0, 0.75))
+import bpy
+bpy.data.objects["Carousel_column"].hide_render = True   # the pump replaces the center column
 ON = 12
 water_spray("Spray", (0, 0, 10.6), ON, F, direction=(0.25, -0.45, 1.0), speed=13, rate=2, life=42)
 water_spray("Spray2", (0, 0, 10.6), ON + 1, F, direction=(-0.3, -0.35, 1.0), speed=12, rate=3, life=42, seed=4)

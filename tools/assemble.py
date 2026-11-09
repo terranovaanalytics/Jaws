@@ -306,12 +306,19 @@ def main():
     res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) else "270:480"
     twos = open(os.path.join(RENDERS, "shot01_establishing", "twos")).read().strip() == "1" \
         if os.path.exists(os.path.join(RENDERS, "shot01_establishing", "twos")) else True
-    vf += (f"scale={res}:flags=neighbor,{'fps=12,' if twos else ''}noise=alls=5:allf=t,fps=24,"
-           "scale=1080:1920:flags=neighbor,") if film else ""
+    hd = res == "1080:1920"
+    if film and hd:
+        # full HD: soft, light grain made at half res and overlaid (~22 MB reel)
+        vf += ("split[x][y];[y]scale=540:960,format=gray,geq=lum='128',noise=alls=12:allf=t,"
+               "scale=1080:1920:flags=bicubic,format=yuv420p[n];[x]format=yuv420p[x2];"
+               "[x2][n]blend=all_mode=overlay:all_opacity=0.5,")
+    elif film:
+        vf += (f"scale={res}:flags=neighbor,{'fps=12,' if twos else ''}noise=alls=5:allf=t,fps=24,"
+               "scale=1080:1920:flags=neighbor,")
     vf += f"ass={ass}"
-    enc = ["-crf", "24", "-preset", "medium"] if film else ["-crf", "20"]
+    enc = ["-crf", "25" if hd else "24", "-preset", "medium"] if film else ["-crf", "20"]
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", body, "-i", AUDIO,
-         "-vf", vf, "-map", "0:v", "-map", "1:a", "-shortest",
+         "-filter_complex", f"[0:v]{vf}[v]", "-map", "[v]", "-map", "1:a", "-shortest",
          "-c:v", "libx264", *enc, "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
          "-movflags", "+faststart", out])
     os.remove(body)
