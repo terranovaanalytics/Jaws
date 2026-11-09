@@ -12,7 +12,7 @@ scene="$1"; name="$(basename "$scene" .py)${JAWS_SUFFIX:-}"; out="renders/$name"
 rm -rf "$out"; mkdir -p "$out"
 JAWS_OUT="$out" xvfb-run -a -s "-screen 0 1280x1024x24" \
   blender -b --factory-startup --python-exit-code 1 -P "$scene" 2>&1 \
-  | grep -E "Error|Traceback|^  File" || true
+  | grep -E "Error|Traceback|^  File" | grep -vE "distutils|Error processing line" || true
 jank="$(cat "$out/jank" 2>/dev/null || echo 0)"
 
 # low-res stage: dithered, reduced palette (jank >= 1)

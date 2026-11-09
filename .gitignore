@@ -1,4 +1,6 @@
 renders/*/
 renders/*_j[0-9].mp4
+final/_*
+audio/*.transcript.json
 __pycache__/
 *.blend1

@@ -3,14 +3,13 @@ Impact shake, splash, passengers tumble off, ferry lists and starts sinking."""
 import math, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
 from jaws.common import (reset_scene, add_sun, add_camera, key_camera, add_shake,
-                         linear_keys, render, FPS, JANK, box, mat)
+                         linear_keys, render, FPS, JANK, box, mat, shot_seconds)
 from jaws.world import (make_ocean, make_island, make_ferry, bob, make_extra, splash,
                         make_ragdoll_extra, rigid, bake_physics)
 from jaws.shark import make_shark, open_jaw, swim_wag
 
-SECONDS = 7.0
-F = int(SECONDS * FPS)
-HIT = 62                      # frame of impact
+F = int(shot_seconds("shot02", 7.0) * FPS)
+HIT = max(34, int(F * 0.37))  # frame of impact
 
 reset_scene(F, world_color=(0.45, 0.75, 1.0))
 add_sun((50, 0, -25), energy=2.4)
@@ -35,8 +34,8 @@ if JANK >= 3:   # BUG: the ferry's physics have a seizure while it sinks
 S = 5.0
 shark = make_shark("Shark", scale=S)
 # fin crosses the foreground left->right (profile to camera), then breaches
-path = [(1, (-12.5, -13, -2.3), 0, 22), (40, (-7, -11, -2.3), 0, 22),
-        (52, (-4.5, -9.0, -0.8), -25, 28), (HIT, (-1.5, -6.6, 1.6), -30, 32),
+path = [(1, (-12.5, -13, -2.3), 0, 22), (HIT - 22, (-7, -11, -2.3), 0, 22),
+        (HIT - 10, (-4.5, -9.0, -0.8), -25, 28), (HIT, (-1.5, -6.6, 1.6), -30, 32),
         (HIT + 14, (0.5, -8.5, -3.0), 35, 32), (HIT + 40, (1.5, -10, -11), 60, 32)]
 if JANK >= 3:   # BUG: no collision. The shark just swims straight through the ferry
     path = path[:4] + [(HIT + 22, (6, 3, 1.6), -30, 32), (HIT + 34, (9, 7, -1), 20, 32),
@@ -46,13 +45,13 @@ for f, loc, pitch, yaw in path:
     shark.root.rotation_euler = (0, math.radians(pitch), math.radians(yaw))
     shark.root.keyframe_insert("location", frame=f)
     shark.root.keyframe_insert("rotation_euler", frame=f)
-open_jaw(shark, 44, 0.0)
-open_jaw(shark, 54, 1.0)
+open_jaw(shark, HIT - 18, 0.0)
+open_jaw(shark, HIT - 8, 1.0)
 open_jaw(shark, HIT, 1.0)
 open_jaw(shark, HIT + 3, 0.2)
 swim_wag(shark, 1, F, period=8, angle=28)
 
-splash("Wake", (-4.5, -9.0, 0), 50, count=10, size=0.5, power=5, seed=2)
+splash("Wake", (-4.5, -9.0, 0), HIT - 12, count=10, size=0.5, power=5, seed=2)
 splash("Hit", (0, -4.3, 1.0), HIT, count=22, size=0.8, power=9, life=30, seed=3)
 splash("Fall", (0.5, -8.5, 0), HIT + 14, count=14, size=0.7, power=7, seed=4)
 

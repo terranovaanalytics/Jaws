@@ -16,7 +16,10 @@ AMBIENT = 0.25      # dim sky fill on objects
 SELF_LIT = 0.40     # share of flat self-lit color in every material
 # JANK: 0 clean low-poly | 1 PS1 hardware (12fps, vertex wobble, low res,
 # dithered palette) | 2 + fog/pop-in, ragdolls, CRT/VHS | 3 + deliberate bugs
-JANK = int(os.environ.get("JAWS_JANK", "0"))
+JANK = int(os.environ.get("JAWS_JANK", "1"))   # project default: 1
+# A scene can opt into another level by putting
+#   os.environ.setdefault("JAWS_JANK", "2")
+# at its top, before importing jaws.*
 PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "4" if JANK >= 1 else "3"))
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -451,3 +454,47 @@ def decal(name, material, size, loc, rot=(90, 0, 0), parent=None, coll=None):
     o.location = loc
     o.rotation_euler = [math.radians(a) for a in rot]
     return link(o, parent, coll)
+
+
+# ---------------------------------------------------------------- text / timing
+BOLD_FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+
+def text(name, body, loc=(0, 0, 0), size=1.0, material=None, rot=(90, 0, 0),
+         align="CENTER", extrude=0.0, parent=None, coll=None, bold=False):
+    """3D text (Blender's built-in font, or the system's DejaVu Sans Bold).
+    Faces -Y by default."""
+    cu = bpy.data.curves.new(name, "FONT")
+    if bold and os.path.exists(BOLD_FONT):
+        cu.font = bpy.data.fonts.load(BOLD_FONT, check_existing=True)
+    cu.body = body
+    cu.size = size
+    cu.align_x = align
+    cu.align_y = "CENTER"
+    cu.extrude = extrude
+    if material:
+        cu.materials.append(material)
+    o = bpy.data.objects.new(name, cu)
+    o.location = loc
+    o.rotation_euler = [math.radians(a) for a in rot]
+    return link(o, parent, coll)
+
+
+def shot_seconds(shot, default):
+    """Shot length: from timing.json (written by tools/assemble.py from the
+    narration timestamps) when present, else the scene's default."""
+    import json
+    p = os.path.join(REPO, "timing.json")
+    if os.path.exists(p):
+        with open(p) as fh:
+            data = json.load(fh)
+        t = data.get(shot) or next((v for k, v in data.items() if k.startswith(shot + "_")), None)
+        if t:
+            return float(t)
+    return float(default)
+
+
+def fog(s, start, depth, color):
+    """Distance fog in `color` (used for underwater shots at any jank level)."""
+    s["world_color"] = list(color)
+    _fog(s, start, depth)

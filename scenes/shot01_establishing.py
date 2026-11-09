@@ -2,11 +2,10 @@
 Camera: slow push-in. Gulls flap by."""
 import os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "lib"))
-from jaws.common import reset_scene, add_sun, add_camera, key_camera, linear_keys, render, FPS
+from jaws.common import reset_scene, add_sun, add_camera, key_camera, linear_keys, render, FPS, shot_seconds
 from jaws.world import make_ocean, make_island, make_ferry, bob, make_gull, flap
 
-SECONDS = 6.0
-F = int(SECONDS * FPS)
+F = int(shot_seconds("shot01", 6.0) * FPS)
 
 reset_scene(F, world_color=(0.45, 0.75, 1.0))
 add_sun((48, 0, -30), energy=2.4)
