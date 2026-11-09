@@ -39,6 +39,24 @@ reference episode: copy its patterns.
    `episodes/jaws6/final/jaws6.mp4` (title + shots + narration + captions).
    Check frames at key lines against the transcript before sending.
 
+## Series so far (for recaps and continuity)
+
+- **Jaws 5**: a shark rams a ferry off Amity, a swarm attacks ("Shark 911").
+  Brody (Pedro Pascal) and oceanographer Jesse (Jesse Plemons, red beanie)
+  track them on radar to an egg cave under the Flying Horses carousel; Brody's
+  mechanical shark sub lures them with a giant ham, they blow the entrance,
+  drill through the carousel and pump the cave dry.
+- **Jaws 6**: opens with "Previously on Jaws 5" (reused Jaws 5 footage) and a
+  99% critics score. Fourth of July in Edgartown Harbor at dusk: a shark rams
+  the fireworks barge, it tips, rockets fire flat into the sailboats ("War of
+  1812", the anthem won't stop). The radar finds them under the harbor; same
+  plan as Jaws 5, cave under the bookstore. Twist: the sharks are
+  **radioactive mutants** (glowing green). Ends on the open question "where
+  are they coming from?": a green glow on the horizon. Sets up Jaws 7.
+- Episode patterns that worked: the title card plays under the intro line
+  when the narration starts at 0 s; a recap shot from earlier renders
+  (`shot01_recap.py`); cast cards on "played by ...".
+
 ## House style (current defaults, chosen by the owner)
 
 - **Full HD clean low-poly**: native 1080x1920, 24 fps, AA 8, soft shadows,
@@ -93,7 +111,8 @@ reference episode: copy its patterns.
   phrases. Ask the owner about unclear phrases and fix them with `SAID`.
 - **Cue matching** tries the transcript first, then the script. Check the
   printed `@ time 'words'` lines; nudge with the third CUES value.
-- **Render time**: full HD is ~4 s/frame (CPU, no GPU), ~2.5 h per episode.
+- **Render time**: full HD is ~3–4 s/frame (CPU, no GPU), ~2–2.5 h per
+  episode (Jaws 6: 18 shots in 1 h 45 min; night shots with many lights ~3 s/frame).
   Cloud background jobs are killed at **2 h**: `render_all.sh` resumes
   (skips finished shots); split long shots with `JAWS_RANGE=1-110`,
   `JAWS_RANGE=111-999`, then `JAWS_ENCODE_ONLY=1` (each step < 10 min).
@@ -119,7 +138,8 @@ reference episode: copy its patterns.
 
 ## Environment
 
-Cloud environment "Jaws": Blender 4.0 + xvfb (apt), `openai-whisper` (pip),
+Cloud environment "Jaws": Blender 4.0 + xvfb (apt), `openai-whisper` (pip;
+if `import whisper` fails at session start, `pip install openai-whisper`),
 network access to `openaipublic.azureedge.net` for Whisper model weights
 (Hugging Face and download.blender.org are blocked). Use `xvfb-run` (faster
 than pure background mode). Commit and push finished renders and finals:
