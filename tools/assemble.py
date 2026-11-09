@@ -296,9 +296,19 @@ def main():
     ass = os.path.join(FINAL, "captions.ass")
     write_captions(tr["words"], ass)
     out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, "jaws5.mp4")
+    # 70s look: film grain goes on once here (cheaper than per shot)
+    look_file = os.path.join(RENDERS, "shot01_establishing", "look")
+    film = os.path.exists(look_file) and open(look_file).read().strip() == "70s"
+    vf = "tpad=stop_mode=clone:stop_duration=3,"           # hold last frame to the end of the audio
+    # chunky PS1-res grain that refreshes on twos (12 fps, like the animation):
+    # full-res per-frame grain made a 300 MB file; this is ~70 MB
+    vf += ("scale=270:480:flags=neighbor,fps=12,noise=alls=5:allf=t,fps=24,"
+           "scale=1080:1920:flags=neighbor,") if film else ""
+    vf += f"ass={ass}"
+    enc = ["-crf", "24", "-preset", "medium"] if film else ["-crf", "20"]
     run(["ffmpeg", "-loglevel", "error", "-y", "-i", body, "-i", AUDIO,
-         "-vf", f"ass={ass}", "-map", "0:v", "-map", "1:a",
-         "-c:v", "libx264", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
+         "-vf", vf, "-map", "0:v", "-map", "1:a", "-shortest",
+         "-c:v", "libx264", *enc, "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
          "-movflags", "+faststart", out])
     os.remove(body)
     print("->", out)

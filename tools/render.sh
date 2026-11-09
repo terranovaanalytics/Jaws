@@ -14,6 +14,15 @@ JAWS_OUT="$out" xvfb-run -a -s "-screen 0 1280x1024x24" \
   blender -b --factory-startup --python-exit-code 1 -P "$scene" 2>&1 \
   | grep -E "Error|Traceback|^  File" | grep -vE "distutils|Error processing line" || true
 jank="$(cat "$out/jank" 2>/dev/null || echo 0)"
+look="$(cat "$out/look" 2>/dev/null || echo sunny)"
+
+# film grade (look=70s): gentle S-curve, teal shadows / amber highlights,
+# no pure white; then at full res a warm halation glow, grain and vignette
+grade="null"; film="null"
+if [ "$look" = "70s" ]; then
+  grade="curves=r='0/0.03 0.25/0.23 0.5/0.52 0.75/0.79 1/0.97':g='0/0.03 0.25/0.22 0.5/0.49 0.75/0.75 1/0.93':b='0/0.07 0.25/0.24 0.5/0.44 0.75/0.65 1/0.80',colorbalance=rs=-0.04:bs=0.05:rh=0.05:bh=-0.05,eq=saturation=0.95"
+  film="split[fa][fb];[fb]curves=all='0/0 0.72/0 1/1',gblur=sigma=16,colorchannelmixer=rr=1:gg=0.55:bb=0.3[fg];[fa][fg]blend=all_mode=screen:all_opacity=0.35,vignette=PI/5.5"   # grain is added once, in tools/assemble.py
+fi
 
 # low-res stage: dithered, reduced palette (jank >= 1)
 pre="null"
@@ -25,16 +34,16 @@ post="null"
 
 if [ -n "${JAWS_FRAMES:-}" ]; then
   for f in "$out"/preview_*.png; do
-    ffmpeg -loglevel error -y -i "$f" -vf "$up" "${f%.png}_big.png"
+    ffmpeg -loglevel error -y -i "$f" -vf "$grade,$up,$film" "${f%.png}_big.png"
   done
   echo "-> $out/preview_*_big.png"
 elif [ -f "$out/still.png" ]; then
-  ffmpeg -loglevel error -y -i "$out/still.png" -vf "$up" "renders/$name.png"
+  ffmpeg -loglevel error -y -i "$out/still.png" -vf "$grade,$up,$film" "renders/$name.png"
   echo "-> renders/$name.png"
 else
   n=$(ls "$out"/f_*.png | wc -l)
   rate=24; [ "$jank" -ge 1 ] && rate=12      # frames were rendered on twos
   ffmpeg -loglevel error -y -framerate $rate -pattern_type glob -i "$out/f_*.png" \
-    -vf "$pre,$up,$post,fps=24" -c:v libx264 -pix_fmt yuv420p -crf 18 "renders/$name.mp4"
+    -vf "$grade,$pre,$up,$film,$post,fps=24" -c:v libx264 -pix_fmt yuv420p -crf 18 "renders/$name.mp4"
   echo "-> renders/$name.mp4 ($n frames rendered, jank $jank)"
 fi

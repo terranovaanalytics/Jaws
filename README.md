@@ -45,6 +45,19 @@ Default is **1**. Set `JAWS_JANK=N` for a render, or put
   shark eyes, CRT/VHS post (scanlines, color bleed, grain, vignette)
 - **3** + deliberate bugs (see `scenes/shot02_ferry_rammed.py`)
 
+## Looks
+
+`JAWS_LOOK=sunny` (default) is the original bright palette. `JAWS_LOOK=70s`
+gives hazy dusty skies, a low warm sun, a muted olive/teal/amber palette, a
+film grade with warm halation and vignette, and chunky grain on twos (added
+in `assemble.py`).
+
+```bash
+export JAWS_LOOK=70s
+for s in scenes/shot*.py; do tools/render.sh $s; done
+python3 tools/assemble.py --out final/jaws5_70s.mp4
+```
+
 ## Requirements
 
 Blender 4.0 (`apt-get install blender xvfb`), ffmpeg, `pip install openai-whisper`.

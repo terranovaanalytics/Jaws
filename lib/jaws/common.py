@@ -12,6 +12,9 @@ from mathutils import Vector
 
 FPS = 24
 OUT_W, OUT_H = 1080, 1920
+# LOOK: "sunny" = original bright palette | "70s" = hazy late-afternoon,
+# muted olive/teal/amber palette, warm low sun (tools/render.sh adds the grade)
+LOOK = os.environ.get("JAWS_LOOK", "sunny")
 AMBIENT = 0.25      # dim sky fill on objects
 SELF_LIT = 0.40     # share of flat self-lit color in every material
 # JANK: 0 clean low-poly | 1 PS1 hardware (12fps, vertex wobble, low res,
@@ -25,8 +28,25 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
 # ---------------------------------------------------------------- scene
+def look_color(c, sky=False):
+    """Remap a color for the current LOOK. 70s: desaturate, warm it up,
+    pull down the brights; skies go hazy and dusty."""
+    if LOOK != "70s":
+        return tuple(c)
+    r, g, b = c[:3]
+    L = 0.3 * r + 0.59 * g + 0.11 * b
+    k = 0.55 if sky else 0.78                       # saturation kept
+    r, g, b = (L + (x - L) * k for x in (r, g, b))
+    r, g, b = r * 1.03, g * 0.98, b * 0.87          # warm / amber cast
+    if sky:
+        r, g, b = (x * 0.8 + h * 0.2 for x, h in zip((r, g, b), (0.72, 0.62, 0.48)))
+    m = 0.92                                        # no pure white
+    return tuple(min(1.0, x) * m for x in (r, g, b))
+
+
 def reset_scene(frames=1, world_color=(0.45, 0.72, 0.95)):
     bpy.ops.wm.read_factory_settings(use_empty=True)
+    world_color = look_color(world_color, sky=True)
     s = bpy.context.scene
     s.render.engine = "BLENDER_EEVEE"
     s.render.fps = FPS
@@ -68,6 +88,10 @@ def reset_scene(frames=1, world_color=(0.45, 0.72, 0.95)):
 
 
 def add_sun(rot_deg=(50, 10, 35), energy=2.2, color=(1, 0.97, 0.9)):
+    if LOOK == "70s":     # low golden late-afternoon sun, long shadows
+        rot_deg = (max(rot_deg[0], 64), rot_deg[1], rot_deg[2])
+        color = (color[0], color[1] * 0.86, color[2] * 0.66)
+        energy *= 1.15
     d = bpy.data.lights.new("Sun", "SUN")
     d.energy = energy
     d.color = color
@@ -140,6 +164,8 @@ def render(out_dir, still=False):
             s.frame_set(f)
     with open(os.path.join(out_dir, "jank"), "w") as fh:
         fh.write(str(JANK))
+    with open(os.path.join(out_dir, "look"), "w") as fh:
+        fh.write(LOOK)
     preview = os.environ.get("JAWS_FRAMES")  # e.g. "1,72,144" for quick checks
     if preview:
         for f in [int(x) for x in preview.split(",")]:
@@ -262,6 +288,9 @@ def mat(name, color, emit=0.0, rough=1.0, metal=0.0, flat=SELF_LIT):
     self-lit color so faces never go muddy. emit>0 makes it glow."""
     if name in _MATS and _MATS[name].name in bpy.data.materials:
         return _MATS[name]
+    color = look_color(color)
+    if LOOK == "70s" and not emit:
+        flat = flat * 0.55          # more real shading, less flat self-light
     m = bpy.data.materials.new(name)
     m.use_nodes = True
     m.diffuse_color = (*color, 1)
