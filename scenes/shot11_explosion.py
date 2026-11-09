@@ -27,7 +27,7 @@ dyn = mat("dynamite", (0.85, 0.08, 0.08))
 for i in range(3):
     cyl(f"Stick{i}", 0.3, 2.0, (-0.6 + i * 0.6, 1.8, -17.6), dyn, n=6)
 lamp = cyl("Lamp", 0.22, 0.2, (0, 1.5, -16.4), mat("lamp_red", (1, 0.1, 0.1), emit=5), n=6, rot=(90, 0, 0))
-BOOM = int(F * 0.45)
+BOOM = max(10, int(F * 0.35))
 blink(lamp, 1, BOOM - 1, period=8, on=4)
 for o in ("Stick0", "Stick1", "Stick2"):
     ob = s.objects[o]
@@ -47,19 +47,19 @@ explosion("Boom", (0, 1.5, -15), BOOM, size=7, count=24, life=22)
 for i in range(9):
     b = box(f"Boulder{i}", [rnd.uniform(2.2, 3.4)] * 3, (0, 0, 0), rock)
     tx, tz = (i % 3 - 1) * 2.2 + rnd.uniform(-0.3, 0.3), -17 + (i // 3) * 2.4
-    start = BOOM + 4 + i * 2
+    start = BOOM + 2 + i
     b.location = (tx + rnd.uniform(-2, 2), 2.5, 8 + i)
     b.keyframe_insert("location", frame=1)
     b.keyframe_insert("location", frame=start)
     b.keyframe_insert("rotation_euler", frame=start)
     b.location = (tx, 2.5, tz)
     b.rotation_euler = (rnd.uniform(-2, 2), rnd.uniform(-2, 2), rnd.uniform(-2, 2))
-    b.keyframe_insert("location", frame=start + 10)
-    b.keyframe_insert("rotation_euler", frame=start + 10)
+    b.keyframe_insert("location", frame=start + 7)
+    b.keyframe_insert("rotation_euler", frame=start + 7)
     b.location.z = tz + 0.6                      # little bounce
-    b.keyframe_insert("location", frame=start + 13)
+    b.keyframe_insert("location", frame=start + 9)
     b.location.z = tz
-    b.keyframe_insert("location", frame=start + 16)
+    b.keyframe_insert("location", frame=start + 11)
 
 cam = add_camera((0, 0, 0), (0, 0, 0), lens=26)
 key_camera(cam, 1, (-3, -24, -12), (0, 3, -14))

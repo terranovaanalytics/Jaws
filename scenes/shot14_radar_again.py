@@ -13,7 +13,7 @@ r = make_radar()
 radar_land(r, "amity", (0.6, 0.3), 0.9, 0.6, label="AMITY")
 radar_land(r, "edgartown", (-1.9, -1.3), 0.7, 0.5, label="EDGARTOWN HARBOR")
 radar_sweep(r, 1, F)
-BEEP = int(F * 0.5)
+BEEP = int(F * 0.40)   # lands on "beep, beep, beep" in the narration
 dot_line(r, "new", (2.4, -3.1), (-1.6, -1.2), 8, BEEP, F, travel=0.55, period=6)
 box("Desk", (14, 4, 1), (0, -2.5, -6.6), mat("desk", (0.35, 0.25, 0.16)))
 

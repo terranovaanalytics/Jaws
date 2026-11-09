@@ -13,7 +13,7 @@ Blender (no downloaded assets), rendered headlessly with EEVEE at
 | `lib/jaws/people.py` | Brody, Jesse (blocky rigs, walk/point helpers) |
 | `lib/jaws/world.py` | ocean, Amity Island, ferry, small boats, extras, gulls, splashes, ragdolls |
 | `lib/jaws/props.py` | carousel, radar screen, shark cave cutaway, bait, explosion, drill, pump, spray |
-| `scenes/shotNN_*.py` | one script per shot (`shot00_title` … `shot14_radar_again`) |
+| `scenes/shotNN_*.py` | one script per shot (`shot00_title` … `shot14_radar_again`, `shot15_endcard`) |
 | `tools/render.sh` | render one scene → `renders/<scene>.mp4` |
 | `tools/assemble.py` | Whisper → shot timing → re-render → title + shots + narration + captions |
 | `scripts/jaws5.md` | the narration script |

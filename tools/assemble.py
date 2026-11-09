@@ -32,24 +32,33 @@ FPS = 24
 
 # shot -> phrase from scripts/jaws5.md where the shot should start.
 # Edit these if a shot should land on a different line.
+# (shot, phrase where the shot starts, nudge in seconds). Phrases are matched
+# against what was actually SAID first (the recording ad-libs), then against
+# scripts/jaws5.md. Avoid "shark" in cues: Whisper often hears it as "shock".
 CUES = [
-    ("shot01_establishing", "we start jaws five on amity island"),
-    ("shot02_ferry_rammed", "ferry that gets rammed by a shark"),
-    ("shot03_swarm", "a whole swarm of great white sharks"),
-    ("shot04_flotilla", "marshalls up all of the boats in amity island harbor"),
-    ("shot05_boats_sinking", "a bunch of them get rammed by sharks"),
-    ("shot06_jesse_arrives", "chief oceanographer jesse"),
-    ("shot07_radar_line", "use their advanced radar detection"),
-    ("shot08_mech_in_line", "mechanical shark submarine"),
-    ("shot09_cave", "all the sharks are going to a shark cave"),
-    ("shot10_bait", "putting some bait in there"),
-    ("shot11_explosion", "put explosives on the cave entrance"),
-    ("shot12_drilling", "kick all the kids off the ride"),
-    ("shot13_pump", "put in a pump and pump out all the water"),
-    ("shot14_radar_again", "their advanced radar goes silent"),
+    ("shot01_establishing", "we're gonna start with jaws 5", 0),
+    ("shot02_ferry_rammed", "a steamship authority ferry", 0),
+    ("shot03_swarm", "people hit the water", 0),
+    ("shot04_flotilla", "police chief brody still alive", 0),
+    ("shot05_boats_sinking", "most of them get rammed and sunk", 0),
+    ("shot06_jesse_arrives", "it makes national news", 0),
+    ("shot07_radar_line", "he brings an advanced radar", 0),
+    ("shot08_mech_in_line", "so police chief brody builds", 0),
+    ("shot09_cave", "blends in and follows the", 0.8),
+    ("shot10_bait", "they hatch a plan", 0),
+    ("shot11_explosion", "blow up the cave entrance", 0),
+    ("shot12_drilling", "then kick the kids off", 1.0),
+    ("shot13_pump", "it's a crazy plan", 0),
+    ("shot14_radar_again", "the radar goes quiet", 0),
+    ("shot15_endcard", "and that leads us to jaws", 0),
 ]
+# Caption fixes for words Whisper reliably mishears in this recording.
+FIXES = {"shock": "shark", "shocks": "sharks", "shock's": "shark's", "edgerton": "Edgartown",
+         "edgertown": "Edgartown",
+         "zazu": "Zissou"}
+PHRASE_FIXES = [(r"\b9\s*-\s*11\b", "911")]
 TITLE = "shot00_title"
-DEFAULTS = {TITLE: 3.0, "shot01_establishing": 6, "shot02_ferry_rammed": 7, "shot03_swarm": 7,
+DEFAULTS = {TITLE: 3.0, "shot15_endcard": 3.5, "shot01_establishing": 6, "shot02_ferry_rammed": 7, "shot03_swarm": 7,
             "shot04_flotilla": 7, "shot05_boats_sinking": 7, "shot06_jesse_arrives": 6,
             "shot07_radar_line": 6, "shot08_mech_in_line": 7, "shot09_cave": 6, "shot10_bait": 6,
             "shot11_explosion": 6, "shot12_drilling": 7, "shot13_pump": 6, "shot14_radar_again": 8}
@@ -70,10 +79,12 @@ def transcribe():
         with open(TRANSCRIPT) as fh:
             return json.load(fh)
     import whisper
-    model = whisper.load_model("small.en")
+    model = whisper.load_model("medium.en")   # small.en heard "shark" as "shock"
     res = model.transcribe(AUDIO, word_timestamps=True, language="en",
-                           initial_prompt="Jaws, Amity Island, Chief Brody, Jesse Plemons, Pedro Pascal, "
-                                          "Steve Zissou, Flying Horses carousel, Edgartown Harbor.")
+                           initial_prompt="Jaws 5. Great white sharks. Shark 911 on Amity Island. Police Chief Brody, "
+                                          "played by Pedro Pascal. Chief oceanographer Jesse, played by Jesse Plemons, "
+                                          "wears a Steve Zissou red cap. Mechanical shark submarine. Shark cave under "
+                                          "the Flying Horses carousel. Edgartown Harbor.")
     words = [dict(w=w["word"].strip(), s=w["start"], e=w["end"])
              for seg in res["segments"] for w in seg.get("words", [])]
     out = dict(text=res["text"], words=words, duration=words[-1]["e"] if words else 0)
@@ -96,9 +107,21 @@ def find_cues(words):
     for blk in sm.get_matching_blocks():
         for k in range(blk.size):
             s2t[blk.a + k] = blk.b + k
-    starts, pos = {}, 0
-    for shot, phrase in CUES:
+    starts, pos, tpos = {}, 0, 0
+    for shot, phrase, nudge in CUES:
         target = [norm(t) for t in phrase.split()]
+        n = len(target)
+        # 1) directly in the transcript (what was actually said)
+        bt, bt_i = 0.0, None
+        for i in range(tpos, len(toks) - n + 1):
+            r = difflib.SequenceMatcher(None, toks[i:i + n], target).ratio()
+            if r > bt:
+                bt, bt_i = r, i
+        if bt_i is not None and bt >= 0.8:
+            starts[shot] = words[bt_i]["s"] + nudge
+            tpos = bt_i + 1
+            print(f"   {shot:24s} @ {starts[shot]:6.2f}s  '{' '.join(w['w'] for w in words[bt_i:bt_i + n])}'")
+            continue
         n = len(target)
         best, best_i = 0.0, None             # where the cue sits in the script
         for i in range(pos, len(script) - n + 1):
@@ -114,13 +137,14 @@ def find_cues(words):
         if ti is None:
             print(f"!! could not hear cue for {shot}: '{phrase}'")
             continue
-        starts[shot] = words[ti]["s"]
+        starts[shot] = words[ti]["s"] + nudge
+        tpos = ti + 1
         print(f"   {shot:24s} @ {starts[shot]:6.2f}s  '{' '.join(w['w'] for w in words[ti:ti + n])}'")
     return starts
 
 
 def compute_timing(starts, duration):
-    shots = [s for s, _ in CUES]
+    shots = [s for s, _, _ in CUES]
     timing = {}
     first = starts.get(shots[0], DEFAULTS[TITLE])
     timing[TITLE] = round(max(2.0, first), 3)
@@ -147,7 +171,7 @@ def rendered_seconds(shot):
 
 
 def render_changed(timing):
-    for shot in [TITLE] + [s for s, _ in CUES]:
+    for shot in [TITLE] + [s for s, _, _ in CUES]:
         have = rendered_seconds(shot)
         want = int(timing.get(shot, DEFAULTS[shot]) * FPS) / FPS
         if have is None or abs(have - want) > 0.1:
@@ -159,6 +183,12 @@ def ass_time(t):
     h, rem = divmod(max(0, t), 3600)
     m, s = divmod(rem, 60)
     return f"{int(h)}:{int(m):02d}:{s:05.2f}"
+
+
+def fix_word(w):
+    core = re.sub(r"^[^\w']+|[^\w']+$", "", w)
+    rep = FIXES.get(core.lower())
+    return w.replace(core, rep) if rep and core else w
 
 
 def write_captions(words, path, offset=0.0, max_words=4, max_gap=0.6):
@@ -179,7 +209,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     def flush():
         if chunk:
-            txt = " ".join(w["w"] for w in chunk).upper()
+            txt = " ".join(fix_word(w["w"]) for w in chunk)
+            for pat, rep in PHRASE_FIXES:
+                txt = re.sub(pat, rep, txt)
+            txt = txt.upper()
             lines.append(f"Dialogue: 0,{ass_time(chunk[0]['s'] + offset)},{ass_time(chunk[-1]['e'] + offset)},Cap,,0,0,0,,{txt}")
             chunk.clear()
 
@@ -215,7 +248,7 @@ def main():
         AUDIO = os.path.abspath(a.audio)
         TRANSCRIPT = os.path.splitext(AUDIO)[0] + ".transcript.json"
     os.makedirs(FINAL, exist_ok=True)
-    shots = [TITLE] + [s for s, _ in CUES]
+    shots = [TITLE] + [s for s, _, _ in CUES]
 
     if a.silent or not os.path.exists(AUDIO):
         if not a.silent:

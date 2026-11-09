@@ -32,7 +32,7 @@ for i in range(14):
     swim_wag(sh, 1, F, period=10, seed=i)
 
 lbl = mat("label_white", (1, 1, 1), emit=1.0)
-text("LblCave", "SHARK CAVE", (-7, -3.4, -14.6), 1.1, lbl, extrude=0.05)
+text("LblCave", "SHARK CAVE", (-3.8, -3.4, -5.6), 1.0, lbl, extrude=0.05)
 box("Arrow", (0.25, 0.1, 3.5), (0, -3.4, -2.3), mat("label_yellow", (1, 0.9, 0.1), emit=1.0))
 text("LblArrow", "V", (0, -3.4, -4.1), 1.4, mat("label_yellow", (1, 0.9, 0.1), emit=1.0), extrude=0.05)
 
