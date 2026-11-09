@@ -175,6 +175,10 @@ def render(out_dir, still=False):
     s = bpy.context.scene
     os.makedirs(out_dir, exist_ok=True)
     apply_jank(s)
+    rng = os.environ.get("JAWS_RANGE")        # e.g. "1-110": render part of a shot
+    if rng and not preview_env():
+        a, b = (int(x) for x in rng.split("-"))
+        s.frame_start, s.frame_end = max(1, a), min(s.frame_end, b)
     if s.rigidbody_world:       # simulate last, after every scene edit
         s.rigidbody_world.point_cache.frame_end = s.frame_end
         for f in range(s.frame_start, s.frame_end + 1):
@@ -203,6 +207,10 @@ def render(out_dir, still=False):
 
 
 # ---------------------------------------------------------------- jank
+def preview_env():
+    return bool(os.environ.get("JAWS_FRAMES"))
+
+
 def apply_jank(s):
     """Scene-wide PS1 degradation, applied right before rendering."""
     if TWOS:
@@ -528,7 +536,9 @@ def text(name, body, loc=(0, 0, 0), size=1.0, material=None, rot=(90, 0, 0),
     o = bpy.data.objects.new(name, cu)
     o.location = loc
     o.rotation_euler = [math.radians(a) for a in rot]
-    o.visible_shadow = False            # labels must not cast ghost copies
+    o.visible_shadow = False            # labels must not cast ghost copies...
+    if material is not None:            # ...EEVEE (legacy) only honors this one
+        material.shadow_method = "NONE"
     return link(o, parent, coll)
 
 

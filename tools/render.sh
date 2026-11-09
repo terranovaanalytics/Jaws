@@ -12,10 +12,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 scene="$1"; name="$(basename "$scene" .py)${JAWS_SUFFIX:-}"; out="renders/$name"
-rm -rf "$out"; mkdir -p "$out"
-JAWS_OUT="$out" xvfb-run -a -s "-screen 0 1280x1024x24" \
+# Long shots can be rendered in parts, then encoded:
+#   JAWS_RANGE=1-110 tools/render.sh S; JAWS_RANGE=111-999 tools/render.sh S; JAWS_ENCODE_ONLY=1 tools/render.sh S
+if [ -z "${JAWS_RANGE:-}" ] && [ -z "${JAWS_ENCODE_ONLY:-}" ]; then rm -rf "$out"; fi
+mkdir -p "$out"
+[ -n "${JAWS_ENCODE_ONLY:-}" ] || JAWS_OUT="$out" xvfb-run -a -s "-screen 0 1280x1024x24" \
   blender -b --factory-startup --python-exit-code 1 -P "$scene" 2>&1 \
   | grep -E "Error|Traceback|^  File" | grep -vE "distutils|Error processing line" || true
+if [ -n "${JAWS_RANGE:-}" ]; then echo "-> part $JAWS_RANGE of $name rendered ($(ls "$out"/f_*.png | wc -l) frames so far)"; exit 0; fi
 jank="$(cat "$out/jank" 2>/dev/null || echo 0)"
 look="$(cat "$out/look" 2>/dev/null || echo sunny)"
 
