@@ -126,6 +126,13 @@ def render(out_dir, still=False):
     """Render frames (or a single still) as PNGs into out_dir."""
     s = bpy.context.scene
     os.makedirs(out_dir, exist_ok=True)
+    preview = os.environ.get("JAWS_FRAMES")  # e.g. "1,72,144" for quick checks
+    if preview:
+        for f in [int(x) for x in preview.split(",")]:
+            s.frame_set(f)
+            s.render.filepath = os.path.join(out_dir, f"preview_{f:04d}.png")
+            bpy.ops.render.render(write_still=True)
+        return
     if still:
         s.render.filepath = os.path.join(out_dir, "still.png")
         bpy.ops.render.render(write_still=True)
