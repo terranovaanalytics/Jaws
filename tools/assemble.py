@@ -302,7 +302,11 @@ def main():
     vf = "tpad=stop_mode=clone:stop_duration=3,"           # hold last frame to the end of the audio
     # chunky PS1-res grain that refreshes on twos (12 fps, like the animation):
     # full-res per-frame grain made a 300 MB file; this is ~70 MB
-    vf += ("scale=270:480:flags=neighbor,fps=12,noise=alls=5:allf=t,fps=24,"
+    res_file = os.path.join(RENDERS, "shot01_establishing", "res")
+    res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) else "270:480"
+    twos = open(os.path.join(RENDERS, "shot01_establishing", "twos")).read().strip() == "1" \
+        if os.path.exists(os.path.join(RENDERS, "shot01_establishing", "twos")) else True
+    vf += (f"scale={res}:flags=neighbor,{'fps=12,' if twos else ''}noise=alls=5:allf=t,fps=24,"
            "scale=1080:1920:flags=neighbor,") if film else ""
     vf += f"ass={ass}"
     enc = ["-crf", "24", "-preset", "medium"] if film else ["-crf", "20"]

@@ -24,6 +24,11 @@ JANK = int(os.environ.get("JAWS_JANK", "1"))   # project default: 1
 #   os.environ.setdefault("JAWS_JANK", "2")
 # at its top, before importing jaws.*
 PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "4" if JANK >= 1 else "3"))
+# Individual knobs (default from JANK; override any one with an env var):
+SNAP = int(os.environ.get("JAWS_SNAP", "1" if JANK >= 1 else "0"))      # PS1 vertex wobble
+TWOS = int(os.environ.get("JAWS_TWOS", "1" if JANK >= 1 else "0"))      # animate on twos
+AA = int(os.environ.get("JAWS_AA", "1"))                                  # EEVEE samples (1 = jaggies)
+# (palette size is JAWS_COLORS in tools/render.sh: 48 at jank>=1, 0 = off)
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
@@ -59,7 +64,7 @@ def reset_scene(frames=1, world_color=(0.45, 0.72, 0.95)):
     s.view_settings.view_transform = "Standard"   # flat, saturated colors
     s.view_settings.look = "None"
     ee = s.eevee
-    ee.taa_render_samples = 1                      # jaggies on purpose
+    ee.taa_render_samples = AA                     # 1 = jaggies on purpose
     ee.use_soft_shadows = False
     ee.shadow_cube_size = "512"
     ee.shadow_cascade_size = "1024"
@@ -166,6 +171,10 @@ def render(out_dir, still=False):
         fh.write(str(JANK))
     with open(os.path.join(out_dir, "look"), "w") as fh:
         fh.write(LOOK)
+    with open(os.path.join(out_dir, "twos"), "w") as fh:
+        fh.write(str(TWOS))
+    with open(os.path.join(out_dir, "res"), "w") as fh:
+        fh.write(f"{s.render.resolution_x}x{s.render.resolution_y}")
     preview = os.environ.get("JAWS_FRAMES")  # e.g. "1,72,144" for quick checks
     if preview:
         for f in [int(x) for x in preview.split(",")]:
@@ -184,8 +193,9 @@ def render(out_dir, still=False):
 # ---------------------------------------------------------------- jank
 def apply_jank(s):
     """Scene-wide PS1 degradation, applied right before rendering."""
-    if JANK >= 1:
+    if TWOS:
         s.frame_step = 2                    # animate on twos: choppy 12fps
+    if SNAP:
         ng = _ps1_snap_group(s.camera, s.render.resolution_y)
         for o in s.objects:
             # skip rigid bodies: snapping their mesh would resize their physics

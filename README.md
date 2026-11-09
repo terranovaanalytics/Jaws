@@ -45,6 +45,20 @@ Default is **1**. Set `JAWS_JANK=N` for a render, or put
   shark eyes, CRT/VHS post (scanlines, color bleed, grain, vignette)
 - **3** + deliberate bugs (see `scenes/shot02_ferry_rammed.py`)
 
+## Quality knobs
+
+Jank sets defaults; override any single one per render:
+
+| Env var | Values | Effect |
+|---|---|---|
+| `JAWS_PIXEL_SCALE` | 4 (now), 3, 2, 1 | internal res 270x480 … native 1080x1920 |
+| `JAWS_SNAP` | 1 / 0 | PS1 vertex wobble on/off |
+| `JAWS_AA` | 1 … 16 | anti-aliasing samples (1 = jagged edges) |
+| `JAWS_COLORS` | 48 / N / 0 | dithered palette size (0 = full color) |
+| `JAWS_TWOS` | 1 / 0 | 12 fps animation vs smooth 24 |
+
+See `renders/quality_compare.png` for four presets on the ferry.
+
 ## Looks
 
 `JAWS_LOOK=sunny` (default) is the original bright palette. `JAWS_LOOK=70s`
