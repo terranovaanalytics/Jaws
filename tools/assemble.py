@@ -283,15 +283,19 @@ def main():
     write_captions(tr["words"], ass)
     out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, f"{NAME}.mp4")
     # 70s look: film grain goes on once here (cheaper than per shot)
-    look_file = os.path.join(RENDERS, CUES[0][0], "look")
+    # render settings come from the first Blender-rendered shot (a shot built from reused
+    # footage writes look "clip" and is skipped)
+    ref = next((sh for sh in shots if os.path.exists(os.path.join(RENDERS, sh, "look"))
+                and open(os.path.join(RENDERS, sh, "look")).read().strip() != "clip"), CUES[0][0])
+    look_file = os.path.join(RENDERS, ref, "look")
     film = os.path.exists(look_file) and open(look_file).read().strip() == "70s"
     vf = "tpad=stop_mode=clone:stop_duration=3,"           # hold last frame to the end of the audio
     # chunky PS1-res grain that refreshes on twos (12 fps, like the animation):
     # full-res per-frame grain made a 300 MB file; this is ~70 MB
-    res_file = os.path.join(RENDERS, CUES[0][0], "res")
+    res_file = os.path.join(RENDERS, ref, "res")
     res = open(res_file).read().strip().replace("x", ":") if os.path.exists(res_file) else "270:480"
-    twos = open(os.path.join(RENDERS, CUES[0][0], "twos")).read().strip() == "1" \
-        if os.path.exists(os.path.join(RENDERS, CUES[0][0], "twos")) else True
+    twos = open(os.path.join(RENDERS, ref, "twos")).read().strip() == "1" \
+        if os.path.exists(os.path.join(RENDERS, ref, "twos")) else True
     hd = res == "1080:1920"
     if film and hd:
         # full HD: soft, light grain made at half res and overlaid (~22 MB reel)
