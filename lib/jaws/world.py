@@ -298,3 +298,62 @@ def splash(name, at, frame, count=14, size=0.5, power=6.0, life=24, seed=0, coll
             o.scale = (sc,) * 3
             o.keyframe_insert("location", frame=frame + k)
             o.keyframe_insert("scale", frame=frame + k)
+
+
+# ---------------------------------------------------------------- ragdolls
+SCREAM = ["........",
+          ".KK..KK.",
+          ".KK..KK.",
+          "........",
+          "...RR...",
+          "..RKKR..",
+          "..RKKR..",
+          "...RR..."]
+
+
+def make_ragdoll_extra(name, loc=(0, 0, 0), seed=0, scale=1.0, coll=None, faces=True):
+    """Tourist as ONE mesh (so it can be a single rigid body), with a
+    pixel-art screaming face. Origin at the hips."""
+    from .common import pixel_mat, decal
+    shirt = mat(f"shirt{seed % len(_SHIRTS)}", _SHIRTS[seed % len(_SHIRTS)])
+    pants = mat("extra_pants", (0.22, 0.25, 0.4))
+    skin_c = [(0.95, 0.75, 0.6), (0.7, 0.5, 0.35), (0.45, 0.3, 0.2)][seed % 3]
+    skin = mat(f"skin{seed % 3}", skin_c)
+    # z offsets centered on the bounding box so the physics box fits the body
+    parts = [((0.36, 0.22, 0.8), (0, 0, -0.5), 1), ((0.46, 0.26, 0.6), (0, 0, 0.2), 0),
+             ((0.3, 0.3, 0.3), (0, 0, 0.68), 2),
+             ((0.12, 0.14, 0.55), (-0.32, 0, 0.65), 0), ((0.12, 0.14, 0.55), (0.32, 0, 0.65), 0)]
+    V, F, M = [], [], []
+    for size, c, mi in parts:
+        v, f = box_data(*[x * scale for x in size], *[x * scale for x in c])
+        off = len(V)
+        V += v
+        F += [tuple(i + off for i in face) for face in f]
+        M += [mi] * len(f)
+    o = mesh_obj(name, V, F, [shirt, pants, skin], face_mat=M, loc=loc, coll=coll)
+    if faces:
+        fm = pixel_mat(f"scream{seed % 3}", SCREAM,
+                       {".": skin_c, "K": (0.02, 0.02, 0.02), "R": (0.75, 0.05, 0.08)})
+        decal(f"{name}_face", fm, (0.3 * scale, 0.3 * scale), (0, -0.152 * scale, 0.68 * scale),
+              parent=o, coll=coll)
+    return o
+
+
+def rigid(obj, kind="ACTIVE", mass=1.0, bounce=0.3, friction=0.6, shape="BOX"):
+    s = bpy.context.scene
+    vl = bpy.context.view_layer
+    for o in vl.objects:
+        o.select_set(False)
+    vl.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.rigidbody.object_add(type=kind)
+    s.rigidbody_world.point_cache.frame_end = s.frame_end
+    rb = obj.rigid_body
+    rb.mass, rb.restitution, rb.friction = mass, bounce, friction
+    rb.collision_shape = shape
+    return rb
+
+
+def bake_physics():
+    """No-op kept for scene compatibility: common.render() simulates the
+    rigid-body cache after all scene edits (edits invalidate the cache)."""

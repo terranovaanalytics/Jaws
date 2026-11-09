@@ -10,7 +10,7 @@ Meshes are built once per variant and shared by every copy, so swarms of
 """
 import math
 import random
-from .common import fix_normals, mat, mesh_obj, empty, cyl_data, box_data
+from .common import JANK, fix_normals, mat, mesh_obj, empty, cyl_data, box_data
 
 # (x, half-width, top, bottom) cross sections, nose toward +X
 FRONT_RINGS = [(-0.40, 0.20, 0.27, -0.20), (0.00, 0.31, 0.36, -0.32),
@@ -149,10 +149,16 @@ def _build_meshes(variant):
         wv = wing + [(x, y, z + 0.04) for x, y, z in wing]
         wf = [(0, 1, 2), (5, 4, 3), (0, 3, 4, 1), (1, 4, 5, 2), (2, 5, 3, 0)]
         add(wv, wf, 0)
-    # eyes
+    # eyes (jank >= 2: big dead googly eyes)
     for side in (-1, 1):
-        v, f = box_data(0.07, 0.03, 0.07, 0.78, side * 0.185, 0.07)
-        add(v, f, 4)
+        if JANK >= 2:
+            v, f = box_data(0.16, 0.05, 0.16, 0.76, side * 0.19, 0.10)
+            add(v, f, 3)
+            v, f = box_data(0.05, 0.03, 0.05, 0.80, side * 0.225, 0.07)
+            add(v, f, 4)
+        else:
+            v, f = box_data(0.07, 0.03, 0.07, 0.78, side * 0.185, 0.07)
+            add(v, f, 4)
     # gills: three dark slits each side
     for side in (-1, 1):
         for k in range(3):

@@ -14,7 +14,10 @@ FPS = 24
 OUT_W, OUT_H = 1080, 1920
 AMBIENT = 0.25      # dim sky fill on objects
 SELF_LIT = 0.40     # share of flat self-lit color in every material
-PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "3"))  # 3 -> renders at 360x640
+# JANK: 0 clean low-poly | 1 PS1 hardware (12fps, vertex wobble, low res,
+# dithered palette) | 2 + fog/pop-in, ragdolls, CRT/VHS | 3 + deliberate bugs
+JANK = int(os.environ.get("JAWS_JANK", "0"))
+PIXEL_SCALE = int(os.environ.get("JAWS_PIXEL_SCALE", "4" if JANK >= 1 else "3"))
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
@@ -39,6 +42,7 @@ def reset_scene(frames=1, world_color=(0.45, 0.72, 0.95)):
     ee.shadow_cascade_size = "1024"
     ee.use_gtao = False
     ee.use_bloom = False
+    s["world_color"] = list(world_color)
     w = bpy.data.worlds.new("World")
     s.world = w
     w.use_nodes = True
@@ -126,6 +130,13 @@ def render(out_dir, still=False):
     """Render frames (or a single still) as PNGs into out_dir."""
     s = bpy.context.scene
     os.makedirs(out_dir, exist_ok=True)
+    apply_jank(s)
+    if s.rigidbody_world:       # simulate last, after every scene edit
+        s.rigidbody_world.point_cache.frame_end = s.frame_end
+        for f in range(s.frame_start, s.frame_end + 1):
+            s.frame_set(f)
+    with open(os.path.join(out_dir, "jank"), "w") as fh:
+        fh.write(str(JANK))
     preview = os.environ.get("JAWS_FRAMES")  # e.g. "1,72,144" for quick checks
     if preview:
         for f in [int(x) for x in preview.split(",")]:
@@ -139,6 +150,104 @@ def render(out_dir, still=False):
     else:
         s.render.filepath = os.path.join(out_dir, "f_")
         bpy.ops.render.render(animation=True)
+
+
+# ---------------------------------------------------------------- jank
+def apply_jank(s):
+    """Scene-wide PS1 degradation, applied right before rendering."""
+    if JANK >= 1:
+        s.frame_step = 2                    # animate on twos: choppy 12fps
+        ng = _ps1_snap_group(s.camera, s.render.resolution_y)
+        for o in s.objects:
+            # skip rigid bodies: snapping their mesh would resize their physics
+            # shape every frame and make them hop on their own
+            if o.type == "MESH" and not o.name.startswith("OceanFar") and o.rigid_body is None:
+                m = o.modifiers.new("PS1Snap", "NODES")
+                m.node_group = ng
+    if JANK >= 2:
+        _fog(s)
+
+
+def _ps1_snap_group(cam, res_y):
+    """Geometry Nodes: snap every vertex to a coarse SCREEN-space grid, like
+    the PS1's integer vertex math. Moving things jitter and wobble."""
+    import math as _m
+    ng = bpy.data.node_groups.new("PS1Snap", "GeometryNodeTree")
+    ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry")
+    ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
+    N, L = ng.nodes, ng.links
+    gi, go = N.new("NodeGroupInput"), N.new("NodeGroupOutput")
+    setp = N.new("GeometryNodeSetPosition")
+    pos = N.new("GeometryNodeInputPosition")
+    selfo = N.new("GeometryNodeSelfObject")
+    me = N.new("GeometryNodeObjectInfo"); me.transform_space = "ORIGINAL"
+    L.new(selfo.outputs[0], me.inputs["Object"])
+    ci = N.new("GeometryNodeObjectInfo"); ci.transform_space = "ORIGINAL"
+    ci.inputs["Object"].default_value = cam
+
+    def vm(op, a, b=None):
+        n = N.new("ShaderNodeVectorMath"); n.operation = op
+        L.new(a, n.inputs[0])
+        if b is not None:
+            L.new(b, n.inputs[1])
+        return n.outputs[0]
+
+    def rot(v, r, inv=False):
+        n = N.new("ShaderNodeVectorRotate"); n.rotation_type = "EULER_XYZ"; n.invert = inv
+        L.new(v, n.inputs["Vector"]); L.new(r, n.inputs["Rotation"])
+        return n.outputs[0]
+
+    def m(op, a, b=None, bv=None):
+        n = N.new("ShaderNodeMath"); n.operation = op
+        L.new(a, n.inputs[0]) if not isinstance(a, float) else None
+        if isinstance(a, float):
+            n.inputs[0].default_value = a
+        if b is not None:
+            L.new(b, n.inputs[1])
+        if bv is not None:
+            n.inputs[1].default_value = bv
+        return n.outputs[0]
+
+    world = vm("ADD", rot(vm("MULTIPLY", pos.outputs[0], me.outputs["Scale"]), me.outputs["Rotation"]),
+               me.outputs["Location"])
+    c = rot(vm("SUBTRACT", world, ci.outputs["Location"]), ci.outputs["Rotation"], inv=True)
+    sep = N.new("ShaderNodeSeparateXYZ"); L.new(c, sep.inputs[0])
+    depth = m("MAXIMUM", m("MULTIPLY", sep.outputs[2], bv=-1.0), bv=0.2)
+    fov_h = 2 * _m.tan(cam.data.angle / 2) if cam else 1.0
+    step = fov_h / (res_y / 2.0)            # one cell = 2 output pixels
+    comb = N.new("ShaderNodeCombineXYZ")
+    for i, out in ((0, sep.outputs[0]), (1, sep.outputs[1])):
+        q = m("SNAP", m("DIVIDE", out, depth), bv=step)
+        L.new(m("MULTIPLY", q, depth), comb.inputs[i])
+    L.new(sep.outputs[2], comb.inputs[2])
+    w2 = vm("ADD", rot(comb.outputs[0], ci.outputs["Rotation"]), ci.outputs["Location"])
+    local = vm("DIVIDE", rot(vm("SUBTRACT", w2, me.outputs["Location"]), me.outputs["Rotation"], inv=True),
+               me.outputs["Scale"])
+    L.new(gi.outputs[0], setp.inputs["Geometry"])
+    L.new(local, setp.inputs["Position"])
+    L.new(setp.outputs[0], go.inputs[0])
+    return ng
+
+
+def _fog(s, start=35.0, depth=120.0):
+    """Thick distance fog in the sky color + short draw distance (pop-in)."""
+    col = tuple(s.get("world_color", (0.5, 0.7, 0.9)))
+    s.world.mist_settings.start = start
+    s.world.mist_settings.depth = depth
+    s.world.mist_settings.falloff = "LINEAR"
+    s.view_layers[0].use_pass_mist = True
+    if s.camera:
+        s.camera.data.clip_end = start + depth * 0.9
+    s.use_nodes = True
+    nt = s.node_tree
+    nt.nodes.clear()
+    rl = nt.nodes.new("CompositorNodeRLayers")
+    mix = nt.nodes.new("CompositorNodeMixRGB")
+    mix.inputs[2].default_value = (*col, 1)
+    comp = nt.nodes.new("CompositorNodeComposite")
+    nt.links.new(rl.outputs["Mist"], mix.inputs[0])
+    nt.links.new(rl.outputs["Image"], mix.inputs[1])
+    nt.links.new(mix.outputs[0], comp.inputs[0])
 
 
 # ---------------------------------------------------------------- materials
@@ -283,3 +392,62 @@ def collection(name):
     c = bpy.data.collections.new(name)
     bpy.context.scene.collection.children.link(c)
     return c
+
+
+# ---------------------------------------------------------------- pixel art
+def pixel_mat(name, rows, palette, flat=None):
+    """MS-Paint-style texture from ASCII art. rows: list of equal-length
+    strings (top row first); palette: char -> (r,g,b) or None (transparent)."""
+    if name in _MATS and _MATS[name].name in bpy.data.materials:
+        return _MATS[name]
+    h, w = len(rows), len(rows[0])
+    img = bpy.data.images.new(name, w, h, alpha=True)
+    px = []
+    for row in reversed(rows):
+        for ch in row:
+            c = palette.get(ch)
+            px += [*c, 1.0] if c else [0, 0, 0, 0]
+    img.pixels = px
+    img.pack()
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    m.blend_method = "CLIP"
+    m.shadow_method = "NONE"
+    nt = m.node_tree
+    nt.nodes.clear()
+    out = nt.nodes.new("ShaderNodeOutputMaterial")
+    tex = nt.nodes.new("ShaderNodeTexImage")
+    tex.image = img
+    tex.interpolation = "Closest"
+    d = nt.nodes.new("ShaderNodeBsdfDiffuse")
+    e = nt.nodes.new("ShaderNodeEmission")
+    e.inputs["Strength"].default_value = SELF_LIT if flat is None else flat
+    add = nt.nodes.new("ShaderNodeAddShader")
+    tr = nt.nodes.new("ShaderNodeBsdfTransparent")
+    mix = nt.nodes.new("ShaderNodeMixShader")
+    nt.links.new(tex.outputs["Color"], d.inputs["Color"])
+    nt.links.new(tex.outputs["Color"], e.inputs["Color"])
+    nt.links.new(d.outputs[0], add.inputs[0])
+    nt.links.new(e.outputs[0], add.inputs[1])
+    nt.links.new(tex.outputs["Alpha"], mix.inputs[0])
+    nt.links.new(tr.outputs[0], mix.inputs[1])
+    nt.links.new(add.outputs[0], mix.inputs[2])
+    nt.links.new(mix.outputs[0], out.inputs[0])
+    _MATS[name] = m
+    return m
+
+
+def decal(name, material, size, loc, rot=(90, 0, 0), parent=None, coll=None):
+    """Flat textured quad (faces -Y by default) for pixel-art faces/signs."""
+    sx, sz = size
+    v = [(-sx / 2, -sz / 2, 0), (sx / 2, -sz / 2, 0), (sx / 2, sz / 2, 0), (-sx / 2, sz / 2, 0)]
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(v, [], [(0, 1, 2, 3)])
+    uv = me.uv_layers.new()
+    for li, (u, w) in zip(range(4), [(0, 0), (1, 0), (1, 1), (0, 1)]):
+        uv.data[li].uv = (u, w)
+    me.materials.append(material)
+    o = bpy.data.objects.new(name, me)
+    o.location = loc
+    o.rotation_euler = [math.radians(a) for a in rot]
+    return link(o, parent, coll)
