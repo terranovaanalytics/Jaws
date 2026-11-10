@@ -53,7 +53,15 @@ reference episode: copy its patterns.
   plan as Jaws 5, cave under the bookstore. Twist: the sharks are
   **radioactive mutants** (glowing green). Ends on the open question "where
   are they coming from?": a green glow on the horizon. Sets up Jaws 7.
-- **Jaws 7**: (built in another session) the Russian nuclear sub; Brody steals it.
+- **Jaws 7**: opens on review scores (audiences loved 5 and 6; a critic: "it's
+  just Jaws 5 but under a bookstore") and a Jaws 6 recap. Brody's mech shark
+  follows a line of mutants into deep water to a giant **Russian nuclear sub**
+  (red star, K-7). Brody flies to DC: the President (played by **Tom Brady**)
+  sends his top CIA officer (played by **Rob Gronkowski**, "Gronk": huge, black
+  suit, shades) to Amity. The sub is gone, only a radioactive trail; they follow
+  it up the coast to Maine and capture the crew, jam the radios, keep one Russian
+  (Ivan, waving on the sail) aboard to look normal. Brody, Jesse and Gronk drop
+  into the hatch: "Boys, we're going to Russia." Sets up Jaws 8.
 - **Jaws 8**: Brody takes the stolen sub to Leningrad with American soldiers in
   ushanka disguises (plus one guy who actually speaks Russian), sneaks into the
   Kremlin and hears Soviet leader Brezhnev (played by **Bill Belichick**: cut-off
@@ -63,7 +71,7 @@ reference episode: copy its patterns.
   Finland and a plane home. Amity was just the start; the plan is still in
   motion; only Brody can stop it. Sets up Jaws 9. Uses the Jaws 7 models
   (`spy.py`: sub, CIA agent = Gronk, the Russian sailor kept on board). The
-  recap's "Jaws 7" clip is a stand-in (`_recap_sub.py`) until Jaws 7 renders exist.
+  recap's Jaws 7 beat reuses `episodes/jaws7/renders/shot06_nuke_sub.mp4`.
 - Episode patterns that worked: the title card plays under the intro line
   when the narration starts at 0 s; a recap shot from earlier renders
   (`shot01_recap.py`); cast cards on "played by ...".
@@ -104,6 +112,10 @@ reference episode: copy its patterns.
 - `town.py` (Jaws 6): `make_bookstore`, `make_marquee`/`chase_bulbs`,
   `make_sailboat`, `make_flag` (waving), `bunting`, `make_pa_pole`,
   `music_notes`, `question_mark`, `light_bulb`, `pop_in`, `make_tomato`.
+- `spy.py` (Jaws 7): `make_nuke_sub` (+ `open_hatch`, `star`), `make_plane`,
+  `make_helicopter`, `spin` (props/rotors), `make_white_house`,
+  `make_oval_office`, `make_pine`, `make_radio`, `make_jammer`, `static_burst`;
+  people `make_president`, `make_agent` (Gronk), `make_russian` (ushanka).
 - `soviet.py` (Jaws 8): `make_sub` (wraps `spy.make_nuke_sub` to float), `make_kremlin`, `make_brezhnev`,
   `make_gronk`, `make_soldier` (ushanka; `disguise=True` adds fake mustache),
   `_hat_ushanka` (any rig), `make_truck`, `make_plane`, `make_border_gate`,
@@ -127,6 +139,10 @@ reference episode: copy its patterns.
 - **Whisper**: use `medium.en` with `WHISPER_PROMPT` (names/places).
   `small.en` heard the owner's "shark" as "shock". Never use "shark" in CUE
   phrases. Ask the owner about unclear phrases and fix them with `SAID`.
+- Whisper can **silently skip** a stretch of narration (Jaws 7 lost 4–30 s on a
+  full pass). Always compare the transcript's gaps against the audio length; if
+  one is missing, transcribe that span in short chunks and patch
+  `audio/transcript.json` by hand (assemble.py reuses the cache).
 - **Cue matching** tries the transcript first, then the script. Check the
   printed `@ time 'words'` lines; nudge with the third CUES value.
 - **Render time**: full HD is ~3–4 s/frame (CPU, no GPU), ~2–2.5 h per
