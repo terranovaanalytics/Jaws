@@ -1,7 +1,7 @@
 """Shot 4: "American soldiers dressed up as Russians. Plus, that one Russian
 guy who speaks Russian so the Russians don't know what's up." Leningrad dock
 at grey dusk: Brody's team marches in wearing ushankas and glued-on
-mustaches (and white sneakers). Their one Russian speaker chats up the two
+mustaches (and white sneakers). Their one real Russian (the sailor kept on board in Jaws 7) chats up the two
 real guards in nonsense Cyrillic; the guards nod along."""
 import math, os, sys
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "lib"))
@@ -10,6 +10,7 @@ from jaws.world import make_ocean
 from jaws.people import make_brody, walk
 from jaws.soviet import make_soldier, make_sub, speech_bubble, make_soviet_flag, _hat_ushanka
 from jaws.town import pop_in
+from jaws.spy import make_russian
 
 F = int(shot_seconds("shot04", 6.1) * FPS)
 STOP = int(F * 0.38)            # they halt in front of the guards
@@ -41,7 +42,7 @@ _hat_ushanka(b, "Brody")
 team.append(b)
 for k in range(3):
     team.append(make_soldier(f"Sol{k}", loc=(-10.0 - k * 1.0, 4.6 - (k % 2) * 0.9, Z), rot_z=90, seed=k))
-spk = make_soldier("Speaker", loc=(-7.6, 3.4, Z), rot_z=90, seed=4)      # the one who speaks Russian
+spk = make_russian("Speaker", loc=(-7.6, 3.4, Z), rot_z=90, stache=True)  # the Russian sailor kept from Jaws 7
 team.append(spk)
 for k, p in enumerate(team):
     walk(p, 1, STOP, period=12)

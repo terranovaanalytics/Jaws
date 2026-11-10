@@ -1,5 +1,4 @@
-"""Jaws 8 assets: the Cold War. Soviet sub (placeholder until the Jaws 7 sub
-is swapped in), the Kremlin, Brezhnev (in a cut-off hoodie), Gronk, ushanka
+"""Jaws 8 assets: the Cold War. The Jaws 7 sub (spy.py) wrapped to float, the Kremlin, Brezhnev (in a cut-off hoodie), Gronk (= spy.make_agent), ushanka
 disguises, the escape truck, border gate, plane, the war-room map, a
 chalkboard playbook, speech bubbles and a Soviet flag.
 
@@ -13,36 +12,21 @@ from .people import _build, Person
 
 # ---------------------------------------------------------------- the sub
 def make_sub(name="Sub", loc=(0, 0, 0), rot_z=0.0, scale=1.0, coll=None):
-    """PLACEHOLDER Soviet nuclear sub (swap for the Jaws 7 model later).
-    Long black cigar hull along +X (bow at +X), sail (conning tower) with a
-    red star and hull number, periscope, red waterline. Origin at the
-    waterline, center of the hull. ~30 m long at scale 1."""
+    """The Jaws 7 Russian nuclear sub (spy.make_nuke_sub), wrapped so it floats:
+    origin at the waterline, bow at +X, ~36 m long at scale 1. Returns
+    dict(root, hatch=(local xyz on top of the sail, where Brody stands),
+    deck_hatch, length, nuke=the spy.py dict)."""
+    from .spy import make_nuke_sub
+    k, z0 = 0.75, -0.9                                     # hull center just under the water
     root = empty(name, loc, coll=coll)
     root.rotation_euler[2] = math.radians(rot_z)
     root.scale = (scale,) * 3
-    hull = mat("sub_hull", (0.10, 0.11, 0.12))
-    red = mat("sub_red", (0.55, 0.08, 0.06))
-    star = mat("sub_star", (0.95, 0.12, 0.08), emit=0.6)
-    white = mat("sub_white", (0.92, 0.92, 0.88))
-    L = 30.0
-    cyl(f"{name}_hull", 2.2, L - 6, (0, 0, -0.6), hull, n=10, rot=(0, 90, 0), parent=root, coll=coll)
-    cyl(f"{name}_bow", 2.2, 4, (L / 2 - 1, 0, -0.6), hull, n=10, r2=0.5, rot=(0, 90, 0), parent=root, coll=coll)
-    cyl(f"{name}_stern", 2.2, 5, (-L / 2 + 0.5, 0, -0.6), hull, n=10, r2=0.4, rot=(0, -90, 0), parent=root,
-        coll=coll)
-    box(f"{name}_waterline", (L - 6, 4.5, 0.25), (0, 0, -0.95), red, parent=root, coll=coll)
-    box(f"{name}_sail", (5.0, 1.6, 3.6), (3, 0, 2.6), hull, parent=root, coll=coll)
-    box(f"{name}_sailtop", (4.6, 1.5, 0.3), (3.1, 0, 4.5), hull, parent=root, coll=coll)
-    for side in (-1, 1):                                    # dive planes on the sail
-        box(f"{name}_plane{side}", (1.4, 2.2, 0.15), (4.6, side * 1.8, 3.9), hull, parent=root, coll=coll)
-        star_o = text(f"{name}_star{side}", "★", (3.4, side * 0.82, 1.9), 1.5, star,
-                      rot=(90, 0, 0 if side < 0 else 180), parent=root, coll=coll, bold=True)
-        text(f"{name}_num{side}", "K-19", (1.6 if side < 0 else 4.6, side * 0.82, 1.3), 0.5, white,
-             rot=(90, 0, 0 if side < 0 else 180), parent=root, coll=coll, bold=True)
-    box(f"{name}_rudder", (1.8, 0.2, 3.0), (-L / 2 - 1, 0, 0.2), hull, parent=root, coll=coll)
-    peri = empty(f"{name}_periscope", (2.4, 0, 4.6), root, coll)
-    cyl(f"{name}_peri", 0.12, 2.4, (0, 0, 1.2), hull, n=6, parent=peri, coll=coll)
-    box(f"{name}_perihead", (0.5, 0.3, 0.3), (0.15, 0, 2.4), hull, parent=peri, coll=coll)
-    return dict(root=root, periscope=peri, hatch=(3.1, 0, 4.7), length=L)
+    n = make_nuke_sub(f"{name}N", (0, 0, z0), scale=k, coll=coll)
+    n["root"].parent = root
+    sx, sy, sz = n["sail_xyz"]
+    hx, hy, hz = n["hatch_xyz"]
+    return dict(root=root, hatch=(sx * k, 0, z0 + sz * k), deck_hatch=(hx * k, 0, z0 + hz * k),
+                length=n["length"] * k, nuke=n)
 
 
 # ---------------------------------------------------------------- Kremlin
@@ -204,33 +188,10 @@ def make_brezhnev(name="Brezhnev", loc=(0, 0, 0), rot_z=0.0, coll=None):
     return P
 
 
-GRONK = dict(
-    leg_len=1.10, leg_w=0.30, torso=(0.98, 0.52, 0.92), arm_len=0.92, arm_w=0.27,
-    head=(0.46, 0.44, 0.50),
-    colors=dict(shirt=(0.13, 0.14, 0.17), pants=(0.12, 0.13, 0.15), shoes=(0.04, 0.04, 0.04),
-                skin=(0.92, 0.70, 0.55), nose=(0.88, 0.60, 0.46), hair=(0.40, 0.28, 0.16),
-                eyes=(0.02, 0.02, 0.02), belt=(0.05, 0.05, 0.05), white=(0.95, 0.95, 0.93),
-                tie=(0.05, 0.05, 0.06), shades=(0.02, 0.02, 0.03), earpiece=(0.85, 0.85, 0.80),
-                teeth=(0.98, 0.98, 0.95)),
-)
-
-
 def make_gronk(name="Gronk", loc=(0, 0, 0), rot_z=0.0, coll=None):
-    """CIA officer Gronk: a huge blocky guy in a black suit, white shirt,
-    skinny black tie, mirror shades, earpiece, short buzzed hair and a big grin."""
-    P = _build(name, GRONK, loc, rot_z, coll)
-    b, t, h = P.b, P.torso, P.head
-    HW, HD, HH, TW, TD, TH = P.HW, P.HD, P.HH, P.TW, P.TD, P.TH
-    fy = -TD / 2
-    b("shirtfront", (0.22, 0.02, TH * 0.55), (0, fy - 0.01, TH * 0.70), "white", t)
-    b("tie", (0.08, 0.03, TH * 0.50), (0, fy - 0.025, TH * 0.68), "tie", t)
-    b("hair_top", (HW + 0.01, HD + 0.01, 0.06), (0, 0.005, HH + 0.01), "hair", h)
-    fz = -HD / 2
-    b("shades", (HW + 0.03, 0.04, 0.10), (0, fz - 0.02, HH * 0.63), "shades", h)
-    b("grin", (0.22, 0.02, 0.06), (0, fz - 0.01, HH * 0.24), "teeth", h)
-    b("earpiece", (0.04, 0.05, 0.05), (HW / 2 + 0.02, 0, HH * 0.5), "earpiece", h)
-    b("chin", (HW * 0.8, HD * 0.4, 0.08), (0, -0.05, 0.02), "skin", h)
-    return P
+    """CIA officer Gronk: the same top CIA agent as Jaws 7 (spy.make_agent)."""
+    from .spy import make_agent
+    return make_agent(name, loc, rot_z, coll)
 
 
 # ---------------------------------------------------------------- vehicles
