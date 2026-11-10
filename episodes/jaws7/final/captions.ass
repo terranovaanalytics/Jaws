@@ -1,0 +1,97 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,DejaVu Sans,86,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,7,3,2,60,60,380,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:00.68,Cap,,0,0,0,,ME AND MY KID
+Dialogue: 0,0:00:00.68,0:00:01.72,Cap,,0,0,0,,ARE REBOOTING THE JAWS
+Dialogue: 0,0:00:01.72,0:00:02.08,Cap,,0,0,0,,SERIES.
+Dialogue: 0,0:00:02.26,0:00:03.10,Cap,,0,0,0,,HERE'S EVERY PLOT FROM
+Dialogue: 0,0:00:03.10,0:00:04.12,Cap,,0,0,0,,JAWS 5 TO JAWS
+Dialogue: 0,0:00:04.12,0:00:04.52,Cap,,0,0,0,,10.
+Dialogue: 0,0:00:04.70,0:00:05.76,Cap,,0,0,0,,JAWS 5 AND JAWS
+Dialogue: 0,0:00:05.76,0:00:06.94,Cap,,0,0,0,,6 HAD NEARLY PERFECT
+Dialogue: 0,0:00:06.94,0:00:07.62,Cap,,0,0,0,,AUDIENCE SCORES,
+Dialogue: 0,0:00:07.84,0:00:08.50,Cap,,0,0,0,,BUT JAWS 6 TOOK
+Dialogue: 0,0:00:08.50,0:00:09.02,Cap,,0,0,0,,A HIT WITH THE
+Dialogue: 0,0:00:09.02,0:00:09.34,Cap,,0,0,0,,CRITICS.
+Dialogue: 0,0:00:09.54,0:00:10.12,Cap,,0,0,0,,ONE GUY SAID,
+Dialogue: 0,0:00:10.34,0:00:11.24,Cap,,0,0,0,,IT'S JUST JAWS 5
+Dialogue: 0,0:00:11.24,0:00:12.08,Cap,,0,0,0,,BUT UNDER A BOOKSTORE.
+Dialogue: 0,0:00:12.36,0:00:12.70,Cap,,0,0,0,,OKAY,
+Dialogue: 0,0:00:12.78,0:00:12.98,Cap,,0,0,0,,BUDDY,
+Dialogue: 0,0:00:13.14,0:00:13.74,Cap,,0,0,0,,BUT THEN WE LEARNED
+Dialogue: 0,0:00:13.74,0:00:14.47,Cap,,0,0,0,,THAT THE SHARKS TURNED
+Dialogue: 0,0:00:14.47,0:00:15.47,Cap,,0,0,0,,OUT TO BE RADIOACTIVE.
+Dialogue: 0,0:00:15.47,0:00:16.66,Cap,,0,0,0,,NOW JAWS 7 ARE
+Dialogue: 0,0:00:16.66,0:00:17.14,Cap,,0,0,0,,YOU READY?
+Dialogue: 0,0:00:17.24,0:00:17.84,Cap,,0,0,0,,LET'S GO.
+Dialogue: 0,0:00:18.18,0:00:18.88,Cap,,0,0,0,,WE GOT ANOTHER LINE
+Dialogue: 0,0:00:18.88,0:00:19.46,Cap,,0,0,0,,OF SHARKS,
+Dialogue: 0,0:00:19.76,0:00:20.46,Cap,,0,0,0,,BUT THIS TIME POLICE
+Dialogue: 0,0:00:20.46,0:00:21.14,Cap,,0,0,0,,CHIEF BRODY,
+Dialogue: 0,0:00:21.24,0:00:22.30,Cap,,0,0,0,,PLAYED BY PEDRO PASCAL,
+Dialogue: 0,0:00:22.58,0:00:23.40,Cap,,0,0,0,,HOPS IN HIS MECHANICAL
+Dialogue: 0,0:00:23.40,0:00:24.10,Cap,,0,0,0,,SHARK SUB,
+Dialogue: 0,0:00:24.36,0:00:24.90,Cap,,0,0,0,,BLENDS IN,
+Dialogue: 0,0:00:25.08,0:00:25.94,Cap,,0,0,0,,AND FOLLOWS THE SHARKS
+Dialogue: 0,0:00:25.94,0:00:26.94,Cap,,0,0,0,,OUT OF THE CAVE,
+Dialogue: 0,0:00:27.16,0:00:28.08,Cap,,0,0,0,,WAY INTO DEEP WATER.
+Dialogue: 0,0:00:28.36,0:00:28.84,Cap,,0,0,0,,AND AT THE END
+Dialogue: 0,0:00:28.84,0:00:29.36,Cap,,0,0,0,,OF THE LINE,
+Dialogue: 0,0:00:29.64,0:00:30.52,Cap,,0,0,0,,HE FINDS A GIANT
+Dialogue: 0,0:00:30.52,0:00:31.98,Cap,,0,0,0,,FRICKIN' NUCLEAR SUBMARINE.
+Dialogue: 0,0:00:32.34,0:00:32.94,Cap,,0,0,0,,AND GUESS WHO IT
+Dialogue: 0,0:00:32.94,0:00:33.18,Cap,,0,0,0,,IS?
+Dialogue: 0,0:00:33.40,0:00:34.74,Cap,,0,0,0,,IT'S THE FRICKIN' RUSSIANS!
+Dialogue: 0,0:00:35.22,0:00:36.06,Cap,,0,0,0,,BRODY GETS ON A
+Dialogue: 0,0:00:36.06,0:00:36.28,Cap,,0,0,0,,PLANE,
+Dialogue: 0,0:00:36.48,0:00:37.30,Cap,,0,0,0,,FLIES TO DC,
+Dialogue: 0,0:00:37.66,0:00:38.46,Cap,,0,0,0,,WALKS RIGHT INTO THE
+Dialogue: 0,0:00:38.46,0:00:39.24,Cap,,0,0,0,,WHITE HOUSE AND SAYS,
+Dialogue: 0,0:00:39.46,0:00:39.66,Cap,,0,0,0,,MR.
+Dialogue: 0,0:00:39.84,0:00:40.06,Cap,,0,0,0,,PRESIDENT,
+Dialogue: 0,0:00:40.34,0:00:41.18,Cap,,0,0,0,,PLAYED BY TOM BRADY,
+Dialogue: 0,0:00:41.44,0:00:42.32,Cap,,0,0,0,,THE RUSSIANS ARE MAKING
+Dialogue: 0,0:00:42.32,0:00:43.86,Cap,,0,0,0,,RADIOACTIVE MUTANT SHARKS AND
+Dialogue: 0,0:00:43.86,0:00:44.76,Cap,,0,0,0,,ATTACKING MY ISLAND.
+Dialogue: 0,0:00:44.94,0:00:45.64,Cap,,0,0,0,,I NEED BACKUP.
+Dialogue: 0,0:00:45.78,0:00:46.76,Cap,,0,0,0,,SO THE PRESIDENT SENDS
+Dialogue: 0,0:00:46.76,0:00:48.10,Cap,,0,0,0,,HIS TOP CIA OFFICER,
+Dialogue: 0,0:00:48.24,0:00:49.42,Cap,,0,0,0,,PLAYED BY ROB GRONKOWSKI,
+Dialogue: 0,0:00:49.60,0:00:50.48,Cap,,0,0,0,,TO AMITY ISLAND.
+Dialogue: 0,0:00:50.48,0:00:51.32,Cap,,0,0,0,,AND THEY GO LOOKING
+Dialogue: 0,0:00:51.32,0:00:51.92,Cap,,0,0,0,,FOR THE SUB.
+Dialogue: 0,0:00:52.12,0:00:53.12,Cap,,0,0,0,,BUT IT'S GONE.
+Dialogue: 0,0:00:53.12,0:00:54.06,Cap,,0,0,0,,AND ALL THAT'S LEFT
+Dialogue: 0,0:00:54.06,0:00:55.18,Cap,,0,0,0,,IS A RADIOACTIVE TRAIL.
+Dialogue: 0,0:00:55.34,0:00:56.22,Cap,,0,0,0,,THEY FOLLOW IT UP
+Dialogue: 0,0:00:56.22,0:00:56.68,Cap,,0,0,0,,THE COAST,
+Dialogue: 0,0:00:56.80,0:00:57.52,Cap,,0,0,0,,ALL THE WAY TO
+Dialogue: 0,0:00:57.52,0:00:57.76,Cap,,0,0,0,,MAINE,
+Dialogue: 0,0:00:57.88,0:00:58.78,Cap,,0,0,0,,AND CAPTURE THE WHOLE
+Dialogue: 0,0:00:58.78,0:00:59.16,Cap,,0,0,0,,CREW.
+Dialogue: 0,0:00:59.16,0:00:59.84,Cap,,0,0,0,,BUT FIRST,
+Dialogue: 0,0:01:00.14,0:01:01.06,Cap,,0,0,0,,THEY JAM THE RADIOS.
+Dialogue: 0,0:01:01.38,0:01:02.34,Cap,,0,0,0,,SO RUSSIA HAS NO
+Dialogue: 0,0:01:02.34,0:01:02.76,Cap,,0,0,0,,IDEA.
+Dialogue: 0,0:01:03.02,0:01:03.86,Cap,,0,0,0,,THEY KEEP ONE RUSSIAN
+Dialogue: 0,0:01:03.86,0:01:04.58,Cap,,0,0,0,,GUY ON BOARD TO
+Dialogue: 0,0:01:04.58,0:01:05.38,Cap,,0,0,0,,MAKE IT LOOK NORMAL.
+Dialogue: 0,0:01:05.74,0:01:06.38,Cap,,0,0,0,,AND THEN POLICE CHIEF
+Dialogue: 0,0:01:06.38,0:01:06.72,Cap,,0,0,0,,BRODY,
+Dialogue: 0,0:01:06.92,0:01:07.12,Cap,,0,0,0,,JESSE,
+Dialogue: 0,0:01:07.36,0:01:08.46,Cap,,0,0,0,,AND GRONK HOP INTO
+Dialogue: 0,0:01:08.46,0:01:09.06,Cap,,0,0,0,,THE SUBMARINE.
+Dialogue: 0,0:01:09.34,0:01:10.18,Cap,,0,0,0,,BRODY LOOKS BACK AND
+Dialogue: 0,0:01:10.18,0:01:10.32,Cap,,0,0,0,,SAYS,
+Dialogue: 0,0:01:10.48,0:01:10.70,Cap,,0,0,0,,BOYS,
+Dialogue: 0,0:01:11.06,0:01:11.82,Cap,,0,0,0,,WE'RE GOING TO RUSSIA.
+Dialogue: 0,0:01:12.14,0:01:12.74,Cap,,0,0,0,,AND THAT SETS US
+Dialogue: 0,0:01:12.74,0:01:13.58,Cap,,0,0,0,,UP FOR JAWS 8.

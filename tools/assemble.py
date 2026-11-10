@@ -284,13 +284,21 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         fh.write(head + "\n".join(lines) + "\n")
 
 
-def concat(shots, out):
-    inputs, filt = [], []
+def concat(shots, out, timing=None):
+    """Join the shot renders. With timing, each shot is held on its last frame
+    (or trimmed) to exactly its timed length: encodes come out a frame or two
+    short, which otherwise adds up to ~1 s of picture running ahead of the audio."""
+    inputs, pre, filt = [], "", []
     for i, s in enumerate(shots):
         inputs += ["-i", os.path.join(RENDERS, f"{s}.mp4")]
-        filt.append(f"[{i}:v]")
+        if timing and s in timing:
+            want = round(timing[s] * FPS) / FPS
+            pre += f"[{i}:v]tpad=stop_mode=clone:stop_duration=1,trim=duration={want:.4f},setpts=PTS-STARTPTS[s{i}];"
+            filt.append(f"[s{i}]")
+        else:
+            filt.append(f"[{i}:v]")
     run(["ffmpeg", "-loglevel", "error", "-y", *inputs, "-filter_complex",
-         "".join(filt) + f"concat=n={len(shots)}:v=1:a=0[v]", "-map", "[v]",
+         pre + "".join(filt) + f"concat=n={len(shots)}:v=1:a=0[v]", "-map", "[v]",
          "-c:v", "libx264", "-crf", "18", "-pix_fmt", "yuv420p", "-r", str(FPS), out])
 
 
@@ -333,7 +341,7 @@ def main():
         render_changed(timing)
     print("4. assembling")
     body = os.path.join(FINAL, "_video.mp4")
-    concat(shots, body)
+    concat(shots, body, timing)
     ass = os.path.join(FINAL, "captions.ass")
     write_captions(tr["words"], ass)
     out = os.path.abspath(a.out) if a.out else os.path.join(FINAL, f"{NAME}.mp4")
