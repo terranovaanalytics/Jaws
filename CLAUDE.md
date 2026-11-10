@@ -62,6 +62,16 @@ reference episode: copy its patterns.
   it up the coast to Maine and capture the crew, jam the radios, keep one Russian
   (Ivan, waving on the sail) aboard to look normal. Brody, Jesse and Gronk drop
   into the hatch: "Boys, we're going to Russia." Sets up Jaws 8.
+- **Jaws 8**: Brody takes the stolen sub to Leningrad with American soldiers in
+  ushanka disguises (plus one guy who actually speaks Russian), sneaks into the
+  Kremlin and hears Soviet leader Brezhnev (played by **Bill Belichick**: cut-off
+  hoodie, X's and O's chalkboard) explain the plan: scare Americans out of the
+  water so nobody joins the Navy or Coast Guard, then win the Cold War at sea.
+  **CIA officer Rob Gronkowski** smuggles Brody and Jesse out in a truck to
+  Finland and a plane home. Amity was just the start; the plan is still in
+  motion; only Brody can stop it. Sets up Jaws 9. Uses the Jaws 7 models
+  (`spy.py`: sub, CIA agent = Gronk, the Russian sailor kept on board). The
+  recap's Jaws 7 beat reuses `episodes/jaws7/renders/shot06_nuke_sub.mp4`.
 - Episode patterns that worked: the title card plays under the intro line
   when the narration starts at 0 s; a recap shot from earlier renders
   (`shot01_recap.py`); cast cards on "played by ...".
@@ -106,6 +116,13 @@ reference episode: copy its patterns.
   `make_helicopter`, `spin` (props/rotors), `make_white_house`,
   `make_oval_office`, `make_pine`, `make_radio`, `make_jammer`, `static_burst`;
   people `make_president`, `make_agent` (Gronk), `make_russian` (ushanka).
+- `soviet.py` (Jaws 8): `make_sub` (wraps `spy.make_nuke_sub` to float), `make_kremlin`, `make_brezhnev`,
+  `make_gronk`, `make_soldier` (ushanka; `disguise=True` adds fake mustache),
+  `_hat_ushanka` (any rig), `make_truck`, `make_plane`, `make_border_gate`,
+  `make_map_table` + `pin`/`dotted_path`/`follow_path` (war-room map),
+  `make_chalkboard`/`chalk_mark`/`chalk_arrow`, `speech_bubble`,
+  `make_soviet_flag`, `make_recruit_booth`, `make_tumbleweed`/`roll`,
+  `alarm_light`, `sweat`, `spin`. Test still: `tests/scenes/test_soviet.py`.
 - Radioactive: `make_shark(..., variant="rad")` (glowing green),
   `props.make_rad_sign`, `make_geiger`/`needle_swing`, `make_beaker`.
 - Reusing old footage: `episodes/jaws6/scenes/shot01_recap.py` loads earlier
