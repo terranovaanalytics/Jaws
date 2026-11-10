@@ -61,8 +61,9 @@ reference episode: copy its patterns.
   water so nobody joins the Navy or Coast Guard, then win the Cold War at sea.
   **CIA officer Rob Gronkowski** smuggles Brody and Jesse out in a truck to
   Finland and a plane home. Amity was just the start; the plan is still in
-  motion; only Brody can stop it. Sets up Jaws 9. The sub is a placeholder
-  (`soviet.make_sub`, `_recap_sub.py`) until the Jaws 7 model/footage is merged.
+  motion; only Brody can stop it. Sets up Jaws 9. Uses the Jaws 7 models
+  (`spy.py`: sub, CIA agent = Gronk, the Russian sailor kept on board). The
+  recap's "Jaws 7" clip is a stand-in (`_recap_sub.py`) until Jaws 7 renders exist.
 - Episode patterns that worked: the title card plays under the intro line
   when the narration starts at 0 s; a recap shot from earlier renders
   (`shot01_recap.py`); cast cards on "played by ...".
@@ -103,7 +104,7 @@ reference episode: copy its patterns.
 - `town.py` (Jaws 6): `make_bookstore`, `make_marquee`/`chase_bulbs`,
   `make_sailboat`, `make_flag` (waving), `bunting`, `make_pa_pole`,
   `music_notes`, `question_mark`, `light_bulb`, `pop_in`, `make_tomato`.
-- `soviet.py` (Jaws 8): `make_sub` (placeholder), `make_kremlin`, `make_brezhnev`,
+- `soviet.py` (Jaws 8): `make_sub` (wraps `spy.make_nuke_sub` to float), `make_kremlin`, `make_brezhnev`,
   `make_gronk`, `make_soldier` (ushanka; `disguise=True` adds fake mustache),
   `_hat_ushanka` (any rig), `make_truck`, `make_plane`, `make_border_gate`,
   `make_map_table` + `pin`/`dotted_path`/`follow_path` (war-room map),
