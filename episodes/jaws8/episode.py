@@ -47,5 +47,5 @@ CAST = [
     ("assets/cast/brezhnev.jpg", "soviet leader brezhnev", "played by bill", 0),
     ("assets/cast/bill_belichick.jpg", "played by bill belichick", None, 0.6),
     ("assets/cast/gronk.jpg", "rob gronkowski smuggles", "played by jesse", 0),
-    ("assets/cast/jesse_plemons.jpg", "played by jesse plemons", None, 0.5),
+    ("assets/cast/jesse_plemons.jpg", "played by jesse", None, 0.9),   # Whisper heard "Blemons"
 ]
