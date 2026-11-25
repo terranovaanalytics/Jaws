@@ -9,12 +9,12 @@ style). Each one keeps the drawing's signature shape and color.
 
 | Drawing | Spy role | Look |
 |---|---|---|
-| Jelly Man | **JELLY**, arms dealer, gelatinous and see-through | translucent purple wobble, tiny sunglasses, white tux |
+| Jelly Man | **JELLY**, arms dealer (he literally deals arms: a briefcase of spare ones), gelatinous and see-through | translucent purple wobble, tiny sunglasses, bow tie |
 | Banana Guy | **AGENT BANANA**, veteran field agent | yellow curved body, tan trench coat, fedora |
 | Two Aliens | **THE TWINS**, mercenaries for hire | green, antennae, matching black suits |
 | Force Field Guy | **DR. BLIP**, the scientist who built the Cronchisk | lab coat, goggles |
 | Cherry Superhero | **AGENT CHERRY**, the young hotshot | red sphere head with a stem, tactical vest, parachute |
-| Meanie | **MEANIES**, henchmen (a whole army) | purple, red visors, identical |
+| Meanie | **MEANIES**, henchmen (a whole army), all wearing extra arms bought from Jelly | purple, red visors, identical, four arms |
 | Spaceship | **THE ORBITER**, Jelly's stealth jet / space station | grey saucer wing, blinking lights |
 | Little Kid | **POCKET**, Dr. Blip's kid, held as leverage | small, backpack |
 | Carrot | **CARROT**, double agent inside the Meanies | orange cone, green leafy hair, Meanie disguise |
@@ -30,7 +30,7 @@ It is the MacGuffin everybody wants.
 | # | Kid's line | Spy beat |
 |---|---|---|
 | 00 | (title) | Rainy night harbor. Neon. A briefcase changes hands. |
-| 01 | "there was a jelly man" | JELLY opens the case: blueprints for the Cronchisk. He smiles and wobbles. |
+| 01 | "there was a jelly man" | The case opens: it is full of spare arms. A Meanie buys a pair, they pop on, he waves all four. JELLY wobbles with glee. |
 | 02 | "a superhero banana stopped him" | AGENT BANANA crashes through a skylight and grabs the case. JELLY oozes down a drain grate and escapes. |
 | 03 | (title sequence) | Spinning crystal, laser lines, silhouettes: **OPERATION CRONCHISK**. |
 | 04 | (briefing) | DIRECTOR C, satellite photo on the wall: "He'll need the Twins." |
@@ -41,7 +41,7 @@ It is the MacGuffin everybody wants.
 | 09 | "cherry superhero came along" | AGENT CHERRY parachutes in at sunset and lands in a roll. |
 | 10 | "stayed on the spaceship" | Cherry hangs on under THE ORBITER as it lifts off; a Twin spots her. Laser corridor. |
 | 11 | "saved the little kid" | In the brig, Cherry frees POCKET, Blip's kid, the leverage. |
-| 12 | "a carrot saved all the meanies" | CARROT, disguised as a Meanie, swaps every Meanie's blaster for a carrot stick. |
+| 12 | "a carrot saved all the meanies" | CARROT, disguised as a Meanie, sneaks down the line and disarms them all: their extra arms pop off. |
 | 13 | "a carrot got eaten up" | JELLY uncovers him and swallows him whole: carrot suspended in jelly, like a 70s salad. |
 | 14 | "he was in somewhere: help!" | Inside the jelly, Carrot whispers into his wrist radio: "Help!" |
 | 15 | "then he saw someone" | Through the wobbly jelly wall: a figure in the shadows. SOMEONE steps into the light: the real boss. |

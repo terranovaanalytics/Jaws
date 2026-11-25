@@ -241,7 +241,7 @@ def make_neon_sign(name, body, loc, size=1.0, color=(1.0, 0.2, 0.6), rot=(90, 0,
 
 def make_briefcase(name="Case", loc=(0, 0, 0), coll=None, color=(0.08, 0.08, 0.09), open_lid=False):
     """Black briefcase (root at the hinge-side bottom). r['lid'] rotates open on X.
-    Inside: rolled blueprints + a pink glow."""
+    Inside: Jelly's merchandise, spare arms (he is an arms dealer)."""
     root = empty(name, loc, coll=coll)
     m = mat(f"case_{color}", color, rough=0.3, metal=0.3)
     chrome = mat("case_chrome", (0.8, 0.8, 0.85), metal=0.9, rough=0.2)
@@ -251,14 +251,18 @@ def make_briefcase(name="Case", loc=(0, 0, 0), coll=None, color=(0.08, 0.08, 0.0
     box(f"{name}_handle", (0.24, 0.05, 0.06), (0, -0.3, 0.12), chrome, parent=root, coll=coll)
     for s in (-1, 1):
         box(f"{name}_latch{s}", (0.06, 0.03, 0.05), (s * 0.25, -0.28, 0.11), chrome, parent=root, coll=coll)
-    bp = mat("blueprint", (0.15, 0.35, 0.85), emit=0.6)
-    for k in range(3):
-        cyl(f"{name}_roll{k}", 0.05, 0.6, (0, -0.15 + k * 0.12, 0.15), bp, n=6, rot=(0, 90, 0), parent=root,
+    arms = []
+    sleeves = [(0.5, 0.3, 0.72), (0.9, 0.2, 0.2), (0.2, 0.5, 0.9), (0.3, 0.7, 0.3)]
+    skin = mat("case_hand", (0.95, 0.76, 0.62))
+    for k in range(4):                                   # four spare arms, packed in a row
+        a = empty(f"{name}_arm{k}", (0, -0.18 + k * 0.12, 0.17), parent=root, coll=coll)
+        box(f"{name}_sleeve{k}", (0.56, 0.11, 0.11), (-0.04, 0, 0), mat(f"case_sleeve{k}", sleeves[k]), parent=a,
             coll=coll)
-    ico(f"{name}_glow", 0.07, (0.25, 0.1, 0.15), mat("crystal_glow", PINK, emit=4.0), parent=root, coll=coll)
+        box(f"{name}_hand{k}", (0.13, 0.11, 0.11), (0.3, 0, 0), skin, parent=a, coll=coll)
+        arms.append(a)
     if open_lid:
         lid.rotation_euler[0] = math.radians(-100)
-    return dict(root=root, lid=lid)
+    return dict(root=root, lid=lid, arms=arms)
 
 
 def open_case(case, f, frames=8, deg=-105):

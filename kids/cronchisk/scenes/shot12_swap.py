@@ -1,4 +1,5 @@
-"""Shot 12: the Meanie armory. Carrot, in a Meanie helmet, swaps every blaster for a carrot stick."""
+"""Shot 12: the Meanie barracks. Every Meanie bought extra arms from Jelly. Carrot, in a Meanie helmet,
+sneaks down the line and disarms them all: pop, pop, pop, the extra arms drop off."""
 import os, sys
 os.environ.setdefault("JAWS_LOOK", "sunny")
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -15,15 +16,26 @@ xs = [-1.8, -0.9, 0.0, 0.9, 1.8]
 ms = []
 for i, x in enumerate(xs):
     m = A.make_meanie(f"Meanie{i}", (x, 2.0, 0), rot_z=0)
-    A.arm(m, "r", 2, -35, frames=1)
-    bl = O.make_blaster(f"Blaster{i}")
-    bl.scale = (1.8,) * 3
-    A.hold(m, bl, "r", offset=(0, -0.02, 0.05), rot=(0, 0, 0))
-    st = O.make_carrot_stick(f"Stick{i}")
-    st.scale = (2.2,) * 3
-    A.hold(m, st, "r", offset=(0, -0.02, 0.05))
-    O.hide_at(bl, times[i])
-    O.show_at(st, times[i])
+    col = [(0.9, 0.2, 0.2), (0.2, 0.5, 0.9), (0.3, 0.75, 0.3), (1.0, 0.75, 0.1), (0.95, 0.45, 0.8)][i]
+    x = A.add_arms(m, color=col)
+    A.arm(m, "l", 2, -90, frames=1, roll=-20)            # all four fists up, menacing
+    A.arm(m, "r", 2, -90, frames=1, roll=20)
+    A.arm(x, "l", 2, -60, frames=1, roll=-40)
+    A.arm(x, "r", 2, -60, frames=1, roll=40)
+    t = times[i]
+    for k, side in enumerate(("arm_l", "arm_r")):        # the extra arms pop off and fall
+        piv = getattr(x, side)
+        drop = box(f"Dropped{i}{k}", (0.17, 0.19, 0.6), (0, 0, 0), mat(f"xarm_{col}", col))
+        hand = box(f"DroppedH{i}{k}", (0.15, 0.15, 0.14), (0, 0, -0.35), m.mats["skin"], parent=drop)
+        O.hide_at(piv, t + k * 2)
+        O.show_at(drop, t + k * 2)
+        sx = (k * 2 - 1) * 0.55
+        O.move(drop, t + k * 2, t + k * 2 + 10, (xs[i] + sx, 2.0, 1.3), (xs[i] + sx * 1.6, 1.6, 0.1), ease=False)
+        drop.keyframe_insert("rotation_euler", frame=t + k * 2)
+        drop.rotation_euler = (math.radians(90), 0, math.radians(30 * (k * 2 - 1)))
+        drop.keyframe_insert("rotation_euler", frame=t + k * 2 + 10)
+    A.arm(m, "l", t + 4, -10, frames=4)                   # and the fight goes out of them
+    A.arm(m, "r", t + 4, -10, frames=4)
     A.bounce(m, 1, F, amp=0.01, period=30 + i * 3)
     ms.append(m)
 cr = A.make_carrot("Carrot", (-3.0, 1.1, 0), rot_z=-60, disguise=True)

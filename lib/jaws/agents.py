@@ -18,7 +18,7 @@ import bpy
 from .common import box, cyl, ico, empty, mat
 from .people import _build, walk, point, _rot_key
 
-__all__ = ["make_jelly", "make_banana", "make_twin", "make_blip", "make_cherry", "make_meanie",
+__all__ = ["add_arms", "make_jelly", "make_banana", "make_twin", "make_blip", "make_cherry", "make_meanie",
            "make_pocket", "make_carrot", "make_director", "make_someone", "make_dark_cherry",
            "walk", "point", "run", "arm", "arms_up", "look", "lean", "hold", "wobble", "glass",
            "hand_pos", "bounce", "turn"]
@@ -326,6 +326,27 @@ def make_someone(name="Someone", loc=(0, 0, 0), rot_z=0.0, coll=None):
     P.b("coat", (0.74, 0.46, 0.6), (0, 0, -0.25), "shirt", t)
     P.b("hicollar", (0.8, 0.46, 0.26), (0, 0.04, 0.8), "lining", t)
     return P
+
+
+def add_arms(P, drop=0.3, sleeve="shirt", coll=None, color=None):
+    """Bolt on a second pair of arms just below the first (bought from Jelly,
+    the arms dealer). Returns an object with .arm_l/.arm_r, so arm(), arms_up()
+    work on it: arm(add_arms(p), "r", f, -90). color: sleeve color of the new arms."""
+    class Extra:
+        pass
+    E = Extra()
+    TW, TH = P.c["torso"][0], P.c["torso"][2]
+    AL, AW = P.c["arm_len"], P.c["arm_w"]
+    for side, attr in ((1, "arm_l"), (-1, "arm_r")):
+        piv = empty(f"{P.name}_x{attr}", (side * (TW / 2 + AW / 2), 0, TH - 0.06 - drop), P.torso, coll)
+        sm = mat(f"xarm_{color}", color) if color else P.mats[sleeve]
+        box(f"{P.name}_x{attr}_m", (AW, AW * 1.1, AL), (0, 0, -AL / 2 + AW / 2), sm, parent=piv, coll=coll)
+        box(f"{P.name}_x{attr}_hand", (AW * 0.9, AW * 0.9, 0.14), (0, 0, -AL + AW / 2 - 0.05), P.mats["skin"],
+            parent=piv, coll=coll)
+        piv.rotation_euler[1] = math.radians(side * 25)
+        setattr(E, attr, piv)
+    E.torso = P.torso
+    return E
 
 
 # ---------------------------------------------------------------- moves

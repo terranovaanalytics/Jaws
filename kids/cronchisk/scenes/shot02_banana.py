@@ -38,6 +38,7 @@ O.show_at(held["root"], GRAB + 4)
 A.turn(b, F - 10, 15, frames=10)
 # Meanie: hands up
 A.arms_up(m, LAND + 6, frames=4)
+A.arms_up(A.add_arms(m, color=(0.9, 0.2, 0.2)), LAND + 6, frames=4, deg=-150)
 A.wobble(j, 1, OOZE, amp=0.06, period=8)
 # Jelly squeezes down the drain
 drain = O.make_drain("Drain", (2.5, -0.9, 0.0))

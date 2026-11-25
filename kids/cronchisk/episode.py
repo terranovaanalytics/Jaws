@@ -34,10 +34,9 @@ SHOTS = [
 CARDS = [
     ("shot00_harbor", 0.6, 2.6, "MIDNIGHT. PIER 9."),
     ("shot00_harbor", 3.4, 2.4, "AN ARMS DEALER..."),
-    ("shot01_jelly", 1.0, 3.6, "...AND A CRYSTAL\nTHAT COULD RULE THE WORLD"),
     ("shot02_banana", 0.4, 2.0, "ONE AGENT"),
     ("shot02_banana", 2.6, 2.6, "STOOD IN HIS WAY"),
-    ("shot04_briefing", 0.4, 4.4, "BUT JELLY HAD HIRED\nHELP"),
+    ("shot04_briefing", 0.4, 4.4, "NOW JELLY WANTED\nTHE CRONCHISK"),
     ("shot05_twins", 0.8, 3.4, "THE TWINS"),
     ("shot06_vault", 0.5, 3.6, "THEY EAT\nANYTHING"),
     ("shot07_bubble", 0.4, 3.8, "THEY TOOK THE SCIENTIST\nWHO BUILT IT"),
@@ -57,6 +56,8 @@ CARDS = [
 SFX = [
     ("shot00_harbor", 0.0, "rain"),
     ("shot01_jelly", 1.2, "latch"),
+    ("shot01_jelly", 2.33, "pop"),
+    ("shot01_jelly", 2.4, "pop"),
     ("shot02_banana", 0.5, "glass"),
     ("shot02_banana", 1.0, "thud"),
     ("shot02_banana", 3.1, "slurp"),
