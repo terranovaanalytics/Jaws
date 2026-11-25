@@ -1,0 +1,71 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1080
+PlayResY: 1920
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Cap,DejaVu Sans,86,&H00FFFFFF,&H00FFFFFF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0,1,7,3,2,60,60,380,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:01.28,Cap,,0,0,0,,OKAY,
+Dialogue: 0,0:00:01.58,0:00:03.04,Cap,,0,0,0,,ONCE UPON A TIME
+Dialogue: 0,0:00:03.04,0:00:05.20,Cap,,0,0,0,,THERE WAS A LITTLE...
+Dialogue: 0,0:00:05.20,0:00:05.94,Cap,,0,0,0,,I MEAN,
+Dialogue: 0,0:00:07.50,0:00:10.00,Cap,,0,0,0,,ONCE UPON A TIME...
+Dialogue: 0,0:00:10.74,0:00:10.90,Cap,,0,0,0,,OH,
+Dialogue: 0,0:00:11.50,0:00:12.68,Cap,,0,0,0,,ONCE UPON A TIME
+Dialogue: 0,0:00:12.68,0:00:13.62,Cap,,0,0,0,,THERE WAS A JELLY
+Dialogue: 0,0:00:13.62,0:00:15.52,Cap,,0,0,0,,MAN HERE AND HE
+Dialogue: 0,0:00:15.52,0:00:16.36,Cap,,0,0,0,,WAS HERE TO TAKE
+Dialogue: 0,0:00:16.36,0:00:17.06,Cap,,0,0,0,,OVER THE WORLD.
+Dialogue: 0,0:00:17.46,0:00:18.80,Cap,,0,0,0,,BUT A SUPER HERO
+Dialogue: 0,0:00:18.80,0:00:21.08,Cap,,0,0,0,,BANANA GUY STOPPED HIM
+Dialogue: 0,0:00:21.08,0:00:22.10,Cap,,0,0,0,,IN HIS TRAP.
+Dialogue: 0,0:00:24.02,0:00:25.74,Cap,,0,0,0,,AND THEN TWO SPACE
+Dialogue: 0,0:00:25.74,0:00:28.14,Cap,,0,0,0,,ALIEN GUYS STEPPED ONTO
+Dialogue: 0,0:00:28.14,0:00:29.10,Cap,,0,0,0,,THE PLATFORM.
+Dialogue: 0,0:00:29.10,0:00:31.18,Cap,,0,0,0,,AND THEN THEY ATE
+Dialogue: 0,0:00:31.18,0:00:32.42,Cap,,0,0,0,,THE SUPER HERO.
+Dialogue: 0,0:00:32.88,0:00:33.28,Cap,,0,0,0,,OH NO!
+Dialogue: 0,0:00:33.96,0:00:34.92,Cap,,0,0,0,,AND THEN A LITTLE
+Dialogue: 0,0:00:34.92,0:00:36.06,Cap,,0,0,0,,GUY IN A FORCE
+Dialogue: 0,0:00:36.06,0:00:36.54,Cap,,0,0,0,,FIELD
+Dialogue: 0,0:00:37.62,0:00:39.04,Cap,,0,0,0,,TRAPPED HIM IN A
+Dialogue: 0,0:00:39.04,0:00:40.38,Cap,,0,0,0,,FORCE FIELD AND TOOK
+Dialogue: 0,0:00:40.38,0:00:41.02,Cap,,0,0,0,,HIM AWAY.
+Dialogue: 0,0:00:41.70,0:00:42.92,Cap,,0,0,0,,BUT THEN HE WAS
+Dialogue: 0,0:00:42.92,0:00:44.06,Cap,,0,0,0,,TRAPPED AND RUN.
+Dialogue: 0,0:00:44.82,0:00:46.10,Cap,,0,0,0,,BUT THEN CHERRY SUPER
+Dialogue: 0,0:00:46.10,0:00:47.18,Cap,,0,0,0,,HERO CAME ALONG.
+Dialogue: 0,0:00:48.20,0:00:48.44,Cap,,0,0,0,,YAY,
+Dialogue: 0,0:00:48.48,0:00:49.34,Cap,,0,0,0,,CHERRY SUPER HERO!
+Dialogue: 0,0:00:50.66,0:00:53.02,Cap,,0,0,0,,AND HE STAYED ON
+Dialogue: 0,0:00:53.02,0:00:53.62,Cap,,0,0,0,,THE MEANIES.
+Dialogue: 0,0:00:53.62,0:00:56.10,Cap,,0,0,0,,LIKE THE ALIEN GOT
+Dialogue: 0,0:00:56.10,0:00:57.52,Cap,,0,0,0,,IN THE SPACESHIP WITH
+Dialogue: 0,0:00:57.52,0:00:58.84,Cap,,0,0,0,,THE MEANIES IN IT.
+Dialogue: 0,0:00:59.18,0:01:02.38,Cap,,0,0,0,,HE ESPECIALLY SAVED THE
+Dialogue: 0,0:01:02.38,0:01:03.38,Cap,,0,0,0,,LITTLE KID.
+Dialogue: 0,0:01:04.90,0:01:06.68,Cap,,0,0,0,,THE LITTLE URMANTY KID.
+Dialogue: 0,0:01:07.42,0:01:09.60,Cap,,0,0,0,,AND THEN A CARROT
+Dialogue: 0,0:01:09.60,0:01:11.48,Cap,,0,0,0,,SAVED ALL OF THE
+Dialogue: 0,0:01:11.48,0:01:11.98,Cap,,0,0,0,,PEOPLE.
+Dialogue: 0,0:01:13.38,0:01:16.16,Cap,,0,0,0,,AND THEN A CARROT
+Dialogue: 0,0:01:16.16,0:01:17.58,Cap,,0,0,0,,GOT EATEN UP BY
+Dialogue: 0,0:01:17.58,0:01:19.62,Cap,,0,0,0,,A COOL MAN BECAUSE
+Dialogue: 0,0:01:19.62,0:01:21.66,Cap,,0,0,0,,HE WAS IN SOMEWHERE.
+Dialogue: 0,0:01:23.62,0:01:26.30,Cap,,0,0,0,,AND THEN HE SAW
+Dialogue: 0,0:01:26.30,0:01:26.98,Cap,,0,0,0,,SOMEONE.
+Dialogue: 0,0:01:29.30,0:01:31.40,Cap,,0,0,0,,HE NEEDED THE CRONCHISK.
+Dialogue: 0,0:01:32.86,0:01:35.54,Cap,,0,0,0,,BUT ANOTHER MEAN CHERRY
+Dialogue: 0,0:01:35.54,0:01:37.66,Cap,,0,0,0,,GUY STOPPED HIM.
+Dialogue: 0,0:01:38.38,0:01:39.40,Cap,,0,0,0,,AND HE SAID,
+Dialogue: 0,0:01:39.66,0:01:40.42,Cap,,0,0,0,,BUH -BYE!
+Dialogue: 0,0:01:40.80,0:01:41.72,Cap,,0,0,0,,AND ALL THE ALIEN
+Dialogue: 0,0:01:41.72,0:01:42.76,Cap,,0,0,0,,GUYS WENT THEIR WAY
+Dialogue: 0,0:01:42.76,0:01:43.26,Cap,,0,0,0,,HOME.
+Dialogue: 0,0:01:43.74,0:01:44.10,Cap,,0,0,0,,THE END!
+Dialogue: 0,0:01:44.60,0:01:44.96,Cap,,0,0,0,,OH,
+Dialogue: 0,0:01:45.06,0:01:45.62,Cap,,0,0,0,,YAY!
