@@ -6,3 +6,6 @@ episodes/*/audio/*.transcript.json
 tests/renders/*/
 __pycache__/
 *.blend1
+kids/*/renders/*/
+kids/*/renders/.render_since
+kids/*/final/_*

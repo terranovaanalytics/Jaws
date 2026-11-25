@@ -40,6 +40,8 @@ def load_episode(name):
     import importlib.util
     NAME = os.path.basename(os.path.normpath(name))
     EPDIR = os.path.join(REPO, "episodes", NAME)
+    if os.sep in name.strip(os.sep) and os.path.isdir(name):    # a path, e.g. kids/jellyman
+        EPDIR = os.path.abspath(name)
     spec = importlib.util.spec_from_file_location(f"episode_{NAME}", os.path.join(EPDIR, "episode.py"))
     EP = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(EP)
@@ -304,7 +306,7 @@ def concat(shots, out, timing=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("episode", help="episode folder name under episodes/, e.g. jaws5")
+    ap.add_argument("episode", help="episode folder name under episodes/ (e.g. jaws5) or a path (kids/jellyman)")
     ap.add_argument("--render", action="store_true", help="re-render shots whose length changed")
     ap.add_argument("--silent", action="store_true", help="no audio: silent draft with default timings")
     ap.add_argument("--audio", help="narration file (default episodes/<name>/audio/narration.*)")

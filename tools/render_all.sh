@@ -8,7 +8,8 @@
 # JAWS_RANGE (see tools/render.sh).
 set -u
 cd "$(dirname "$0")/.."
-ep="episodes/${1:?usage: tools/render_all.sh <episode>}"
+ep="episodes/${1:?usage: tools/render_all.sh <episode or path>}"
+[ -d "$1" ] && [[ "$1" == */* ]] && ep="${1%/}"
 mkdir -p "$ep/renders"
 mark="$ep/renders/.render_since"
 [ -f "$mark" ] || touch "$mark"
