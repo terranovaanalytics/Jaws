@@ -178,3 +178,23 @@ network access to `openaipublic.azureedge.net` for Whisper model weights
 (Hugging Face and download.blender.org are blocked). Use `xvfb-run` (faster
 than pure background mode). Commit and push finished renders and finals:
 the container is temporary.
+
+## Kids' stories (`kids/`)
+
+Side projects in the same pipeline, one folder each (`render_all.sh` and
+`assemble.py` take the path, e.g. `kids/jellyman`).
+
+- **Attack of the Jelly Man** (`kids/jellyman/`): the owner's 5-year-old's
+  recorded story + 12 drawings. Drawings become paper-cutout puppets
+  (`tools/cutout.py`, config in `story.py`; `lib/jaws/kids.py` for puppets,
+  storybook land, props). Sunny look, narration + captions via `assemble.py`.
+- **Operation Cronchisk** (`kids/cronchisk/`): a blocky spy-thriller remake of
+  the Jelly Man story (plot in `treatment.md`). Cast in `lib/jaws/agents.py`
+  (Jelly, Agents Banana/Cherry, the Twins, Dr. Blip, Meanies, Pocket, Carrot,
+  Director C, Someone, Dark Cherry; test still `tests/scenes/test_agents.py`),
+  spy props/sets in `lib/jaws/ops.py` (rain, neon, briefcase, vault, Orbiter,
+  parachute, doomsday uplink + countdown, yacht...), shared sets in
+  `kids/cronchisk/scenes/sets.py`. No narration: `python3 tools/trailer.py
+  kids/cronchisk` writes timing.json from `SHOTS`, synthesizes a spy score +
+  SFX with numpy (`MUSIC`, `SFX` in episode.py), burns in trailer text `CARDS`.
+  No natural TTS is available offline here (only espeak); Hugging Face is blocked.
